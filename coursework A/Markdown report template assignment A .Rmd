@@ -1,7 +1,7 @@
 ---
 title: "Report Template coursework assignment A - 2021"
 subtitle: "CS4125 Seminar Research Methodology for Data Science"
-author: "Thomas Bos (), Daniël van Gelder (4551028), Jessie van Schijndel"
+author: "Thomas Bos (4543408), Daniël van Gelder (4551028), Jessie van Schijndel"
 date: "20/04/2021"
 output:
    pdf_document:
@@ -24,7 +24,9 @@ knitr::opts_chunk$set(echo = TRUE)
 (Max 250 words)
 
 ## The theory underlying the research  
-(Max 250 words) Preferable based on theories reported in literature
+<!-- (Max 250 words) Preferable based on theories reported in literature-->
+<!-- I am not really covering how the experiments should be done, this may be important to add? Currently ~210 words.-->
+Figlio et al. (2013) presented, according to them, the first experimental evidence on the effects of live versus online instruction. In this research, participants took an entire microeconomics course either only attending live lectures or online lectures. Exam performance was then compared between both groups and all students which did not volunteer to participate in the experiment but did still follow the course. Result showed that there is a modest difference in exam scores in favour of the students only attending live lectures, although the authors state that the experiments had many limitations and that further research is necessary. In contrary, a more recent survey by Nguyen (2015), which summarizes results of multiple studies, has found that 92% makes online education to be at least as effective, if not better, than live education. However, it is also important to recognize other issues that may arise when switching teaching modalities, which becomes clear when such a shift is forced due to, for example, the onset of COVID-19. In a very recent study by Finnegan (2021), results showed that while results are marginally worse after the shift to online teaching, student experience has deteriorated when their learning environment is suddenly changed, especially with students with poor online access.
 
 
 ## Research questions 
@@ -41,7 +43,12 @@ This model should include:
 
 
 ## Experimental Design 
-Note that the study should have a true experimental design
+<!-- Note that the study should have a true experimental design -->
+<!-- 
+- Multiple lectures? (Different group sizes, different topics, etc.) 
+- How to place the online group? (isolated in cubicles, Drebbelweg Tentamenzaal, etc.)
+-->
+In order to determine the difference between live and online lectures on students with respect to acquired knowledge the experimental design Pre-test Post-test randomized controlled trail was chosen. This means the participants can be tested before and after the lecture so that the difference in test results, the dependent variable, can be used as an indicator of knowledge gained from said lectures. For the lecture itself, the participants will be divided randomly over live and online groups such that the live group will attend a lecture face-to-face with a lecturer, and the online group will attend the lecture via an online platform such as Zoom. In order to minimize the influence of moderating variables such as video/audio quality and distractions, the online group will watch the lecture in a quiet, moderated environment on identical systems specifically set up for the experiment.
 
 ## Experimental procedure 
 Describe how the experiment will be executed step by step
@@ -51,7 +58,9 @@ Describe how the experiment will be executed step by step
 Describe the measure that will be used
 
 ## Participants
-Describe which participants will recruit in the study and how they will be recruited
+<!-- Describe which participants will recruit in the study and how they will be recruited -->
+<!-- What to add? -->
+Participants should be students and could be recruited by asking for volunteers across a university campus. A small compensation could be offered in return as a sign of appreciation.
 
 ## Suggested statistical analyses
 Describe the statistical test you suggest to care out on the collected data
@@ -142,9 +151,9 @@ setup_twitter_oauth(consumer_key,consumer_scret, access_token,access_scret) #con
 ##  You should replace this with your own celebrities, at least 3, but more preferred 
 ##  Note that it will take the computer some to collect the tweets
 
-tweets_T <- searchTwitter("#trump", n=300, lang="en", resultType="recent") #300 recent tweets about Donald Trump, in English (I think that 1500 tweets is max)
-tweets_C <- searchTwitter("#hillary", n=300, lang="en", resultType="recent") #300 recent tweets about Hillary Clinton
-tweets_B <- searchTwitter("#bernie", n=300, lang="en", resultType="recent") #300 recent tweets about Bernie Sanders
+tweets_T <- searchTwitter("#rutte", n=300, lang="en", resultType="recent") #300 recent tweets about Donald Trump, in English (I think that 1500 tweets is max)
+tweets_C <- searchTwitter("#biden", n=300, lang="en", resultType="recent") #300 recent tweets about Hillary Clinton
+tweets_B <- searchTwitter("#putin", n=300, lang="en", resultType="recent") #300 recent tweets about Bernie Sanders
 
 
 
