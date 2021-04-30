@@ -1,7 +1,7 @@
 ---
 title: "Report Template coursework assignment A - 2021"
 subtitle: "CS4125 Seminar Research Methodology for Data Science"
-author: "Thomas Bos (), Daniël van Gelder (4551028), Jessie van Schijndel"
+author: "Thomas Bos (), Daniël van Gelder (4551028), Jessie van Schijndel (5407397)"
 date: "20/04/2021"
 output:
    pdf_document:
@@ -28,8 +28,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ## Research questions 
-Our research question is 'What 
 The research question that will be examined in the experiment (or alternatively the hypothesis that will be tested in the experiment)
+
+Our research question is the following: "How is students' understanding of lecture material affected by attending the lecture live rather than online?"
+
 
 
 ## The related conceptual model 
@@ -46,6 +48,10 @@ Note that the study should have a true experimental design
 ## Experimental procedure 
 Describe how the experiment will be executed step by step
 
+First, we ask all students in the class who have agreed to participate in our experiment to perform a pre-test a day before the lecture. The pre-test will consist of questions composed by the teacher giving the lecture. The questions should reflect the main learning goals of the lecture. Ideally, this pre-test is done in a controlled setting on campus. If this is not possible due to governmental restrictions, the pre-test is performed online. All students perform the pre-test at the same time. After the pre-test, students are assigned to either the live lecture condition or the online lecture condition. To reduce unexplained variability, we will opt for a randomized block design. We will divide similar participants into blocks based on their pre-test scores. Then, we randomly assign participants from each block to the live condition or the online condition. Students in both conditions will follow the same lecture at the same time. A day after the lecture, the students perform a post-test. Just like the pre-test, the post-test will consist of questions composed by the teacher giving the lecture and should reflect the main learning goals of the lecture. However, the questions from the pre-test should not be repeated. Again, this post-test is ideally done in a controlled setting on campus, but may have to be performed online. Both the pre-test and the post-test will be graded by the teacher on a scale from 1 to 10.
+
+*Comment by Jessie: Perhaps we could also create groups which do not perform the pre-test to see the influence of this test on the post-test results.*
+
 
 ## Measures
 Describe the measure that will be used
@@ -55,6 +61,12 @@ Describe which participants will recruit in the study and how they will be recru
 
 ## Suggested statistical analyses
 Describe the statistical test you suggest to care out on the collected data
+
+First, we determine our null hypothesis $H_0$ and alternative hypothesis $H_1$. Our null hypothesis states that there is no difference in student understanding of the lecture material between the two different conditions. Our alternative hypothesis states that there is a difference in student understanding. We create two linear models to predict student understanding of lecture material. First, we create a model which has only an intercept. This model does not use the information about which condition a participant was in. This model will be referred to as $m_0$. Second, we create a model which does include this information ass a predictor. This model will be referred to as $m_1$. Then, we compare the fits of the two models to the data. We determine whether $m_1$ fits significantly better than $m_0$ through an ANOVA F-test. If this is not the case, we cannot reject our null hypothesis. We may also inspect the significance of the parameters of $m_1$. If the effect of the condition parameter is not significant, we cannot reject our null hypothesis.
+
+
+
+
 
 # Part 2 - Generalized linear models
 
