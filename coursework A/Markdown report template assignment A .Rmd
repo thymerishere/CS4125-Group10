@@ -1,7 +1,7 @@
 ---
 title: "Report Template coursework assignment A - 2021"
 subtitle: "CS4125 Seminar Research Methodology for Data Science"
-author: "Thomas Bos (), Daniël van Gelder (4551028), Jessie van Schijndel (5407397)"
+author: "Thomas Bos (4543408), Daniël van Gelder (4551028), Jessie van Schijndel (5407397)"
 date: "20/04/2021"
 output:
    pdf_document:
@@ -24,11 +24,15 @@ knitr::opts_chunk$set(echo = TRUE)
 (Max 250 words)
 
 ## The theory underlying the research  
-(Max 250 words) Preferable based on theories reported in literature
+<!-- (Max 250 words) Preferable based on theories reported in literature-->
+<!-- I am not really covering how the experiments should be done, this may be important to add? Currently ~210 words.-->
+Figlio et al. (2013) presented, according to them, the first experimental evidence on the effects of live versus online instruction. In this research, participants took an entire microeconomics course either only attending live lectures or online lectures. Exam performance was then compared between both groups and all students which did not volunteer to participate in the experiment but did still follow the course. Result showed that there is a modest difference in exam scores in favour of the students only attending live lectures, although the authors state that the experiments had many limitations and that further research is necessary. In contrary, a more recent survey by Nguyen (2015), which summarizes results of multiple studies, has found that 92% makes online education to be at least as effective, if not better, than live education. However, it is also important to recognize other issues that may arise when switching teaching modalities, which becomes clear when such a shift is forced due to, for example, the onset of COVID-19. In a very recent study by Finnegan (2021), results showed that while results are marginally worse after the shift to online teaching, student experience has deteriorated when their learning environment is suddenly changed, especially with students with poor online access.
 
 
 ## Research questions 
+<!--
 The research question that will be examined in the experiment (or alternatively the hypothesis that will be tested in the experiment)
+-->
 
 Our research question is the following: "How is students' understanding of lecture material affected by attending the lecture live rather than online?"
 
@@ -43,24 +47,35 @@ This model should include:
 
 
 ## Experimental Design 
-Note that the study should have a true experimental design
+<!-- Note that the study should have a true experimental design -->
+<!-- 
+- Multiple lectures? (Different group sizes, different topics, etc.) 
+- How to place the online group? (isolated in cubicles, Drebbelweg Tentamenzaal, etc.)
+-->
+In order to determine the difference between live and online lectures on students with respect to acquired knowledge the experimental design Pre-test Post-test randomized controlled trail was chosen. This means the participants can be tested before and after the lecture so that the difference in test results, the dependent variable, can be used as an indicator of knowledge gained from said lectures. For the lecture itself, the participants will be divided randomly over live and online groups such that the live group will attend a lecture face-to-face with a lecturer, and the online group will attend the lecture via an online platform such as Zoom. In order to minimize the influence of moderating variables such as video/audio quality and distractions, the online group will watch the lecture in a quiet, moderated environment on identical systems specifically set up for the experiment.
 
 ## Experimental procedure 
+<!--
 Describe how the experiment will be executed step by step
+-->
 
 First, we ask all students in the class who have agreed to participate in our experiment to perform a pre-test a day before the lecture. The pre-test will consist of questions composed by the teacher giving the lecture. The questions should reflect the main learning goals of the lecture. Ideally, this pre-test is done in a controlled setting on campus. If this is not possible due to governmental restrictions, the pre-test is performed online. All students perform the pre-test at the same time. After the pre-test, students are assigned to either the live lecture condition or the online lecture condition. To reduce unexplained variability, we will opt for a randomized block design. We will divide similar participants into blocks based on their pre-test scores. Then, we randomly assign participants from each block to the live condition or the online condition. Students in both conditions will follow the same lecture at the same time. A day after the lecture, the students perform a post-test. Just like the pre-test, the post-test will consist of questions composed by the teacher giving the lecture and should reflect the main learning goals of the lecture. However, the questions from the pre-test should not be repeated. Again, this post-test is ideally done in a controlled setting on campus, but may have to be performed online. Both the pre-test and the post-test will be graded by the teacher on a scale from 1 to 10.
-
-*Comment by Jessie: Perhaps we could also create groups which do not perform the pre-test to see the influence of this test on the post-test results.*
-
+<!--
+Perhaps we could also create groups which do not perform the pre-test to see the influence of this test on the post-test results.
+-->
 
 ## Measures
 Describe the measure that will be used
 
 ## Participants
-Describe which participants will recruit in the study and how they will be recruited
+<!-- Describe which participants will recruit in the study and how they will be recruited -->
+<!-- What to add? -->
+Participants should be students and could be recruited by asking for volunteers across a university campus. A small compensation could be offered in return as a sign of appreciation.
 
 ## Suggested statistical analyses
-Describe the statistical test you suggest to care out on the collected data
+<!-- 
+Describe the statistical test you suggest to care out on the collected data 
+-->
 
 First, we determine our null hypothesis $H_0$ and alternative hypothesis $H_1$. Our null hypothesis states that there is no difference in student understanding of the lecture material between the two different conditions. Our alternative hypothesis states that there is a difference in student understanding. We create two linear models to predict student understanding of lecture material. First, we create a model which has only an intercept. This model does not use the information about which condition a participant was in. This model will be referred to as $m_0$. Second, we create a model which does include this information ass a predictor. This model will be referred to as $m_1$. Then, we compare the fits of the two models to the data. We determine whether $m_1$ fits significantly better than $m_0$ through an ANOVA F-test. If this is not the case, we cannot reject our null hypothesis. We may also inspect the significance of the parameters of $m_1$. If the effect of the condition parameter is not significant, we cannot reject our null hypothesis.
 
@@ -154,9 +169,9 @@ setup_twitter_oauth(consumer_key,consumer_scret, access_token,access_scret) #con
 ##  You should replace this with your own celebrities, at least 3, but more preferred 
 ##  Note that it will take the computer some to collect the tweets
 
-tweets_T <- searchTwitter("#trump", n=300, lang="en", resultType="recent") #300 recent tweets about Donald Trump, in English (I think that 1500 tweets is max)
-tweets_C <- searchTwitter("#hillary", n=300, lang="en", resultType="recent") #300 recent tweets about Hillary Clinton
-tweets_B <- searchTwitter("#bernie", n=300, lang="en", resultType="recent") #300 recent tweets about Bernie Sanders
+tweets_T <- searchTwitter("#rutte", n=300, lang="en", resultType="recent") #300 recent tweets about Donald Trump, in English (I think that 1500 tweets is max)
+tweets_C <- searchTwitter("#biden", n=300, lang="en", resultType="recent") #300 recent tweets about Hillary Clinton
+tweets_B <- searchTwitter("#putin", n=300, lang="en", resultType="recent") #300 recent tweets about Bernie Sanders
 
 
 
