@@ -107,7 +107,8 @@ First, we determine our null hypothesis $H_0$ and alternative hypothesis $H_1$. 
 ## Question 1 Twitter sentiment analysis (Between groups - single factor) 
 
 ### Conceptual model
-Make a conceptual model for the following research question: Is there a difference in the sentiment of the tweets related to the different celebrities?
+<!-- Make a conceptual model for the following research question: Is there a difference in the sentiment of the tweets related to the different celebrities? -->
+![The conceptual model. Different attributes of a celebrity are shown which may influence the sentiment of tweets related to a certain celebrity.]("2.1.png")
 
 ### Collecting tweets, and data preparation
 Include the annotated R script (excluding your personal Keys and Access Tokens information), but put echo=FALSE, so code is not included in the output pdf file.
