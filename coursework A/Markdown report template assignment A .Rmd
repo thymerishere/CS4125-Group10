@@ -22,6 +22,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## The motivation for the planned research 
 (Max 250 words)
+The coronavirus pandemic has had a great impact on many aspects of society. University education, in particular, has changed significantly. As education in many countries has shifted from physical lectures to online teleconferencing lectures, concerns have been raised with regards to the effectiveness of this method of education. While the technological developments surrounding teleconferencing have enabled an almost seamless transition from offline to online education, it may be that the lack of a physically present lecturer may affect the comprehensibility of the lecture material for students. With this research, we aim to address whether the students' understanding of the lecture material is affected by a different learning setting (i.e., from home watching an online lecture). The results may reveal whether online education is a way to move forward out of the pandemic. Moreover, if the results indicate no significant change in student understanding of material it may open up the way for new form of education, where students could enroll into "digital universities" without needing to be present at any time.
 
 ## The theory underlying the research  
 (Max 250 words) Preferable based on theories reported in literature
@@ -39,6 +40,24 @@ This model should include:
 *Mediating variable (at least 1)
 *Moderating variable (at least 1)
 
+The following sections describe the conceptual model for each type of variable:
+
+### Independent Variable (IV)
+The IV of this research is whether the participant (student) attends the lecture physically or from home through online teleconferencing. 
+
+### Dependent Variable (DV)
+The DV of this research is the relative score increase on the test that students make. Before the experiment the participants make a small test regarding the lecture material for which the score is expected to be low as the participants are expected to have no prior knowledge regarding the material. Then after the lecture the students make the same test regarding the lecture material. The relative increase (or unlikely decrease) of score will be the DV.
+
+### Mediating Variable
+As the students perform the test in a different setting (from home or on campus) depending on the IV. The change in setting is expected to have a mediating effect on the relationship  between the IV and DV.
+
+### Moderating Variable
+There are several factors which may a moderating effect on the relationship between the IV and the DV which are difficult control on the experiment. These mostly have to do with the environment in which the lecture is attended. The following list describes the specific variables which are believed to have this moderating effect:
+
+- (online lecture) video/audio quality
+- (online lecture) device that is used to attend lecture (e.g. laptop, tablet, smartphone)
+- (both physical and online lecture) presence of noise and/or distraction in environment of watching lecture
+
 
 ## Experimental Design 
 Note that the study should have a true experimental design
@@ -48,7 +67,7 @@ Describe how the experiment will be executed step by step
 
 
 ## Measures
-Describe the measure that will be used
+In the experiment, both participant groups will take a pre-test and a post-test. This test aims to evaluate the participants' comprehension of the lecture material. The pre-test is meant to serve as a baseline measurement to rule out any pre-existing knowledge of the participants. Both tests will be identical and will be in the form of a multiple choice exam of ten questions to be taken in a short time span (10 minutes). The score of the test is defined as the proportion of correct answers. The measure of the experiment is the ratio between these to tests for each particpant: the score of the post-test divided by the score of the pre-test. 
 
 ## Participants
 Describe which participants will recruit in the study and how they will be recruited
