@@ -117,8 +117,8 @@ Include the annotated R script (excluding your personal Keys and Access Tokens i
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, include = FALSE}
 
 #during writing you could add "eval = FALSE",  kntr will than not run this code chunk (take some time do)
-
-setwd("~/OneDrive/Documents/MSc/Q4/Seminar Research Methodology for Data Science/coursework A") 
+source("working_dir.R")
+setwd(wd) 
 # apple , note use / instead of \, which used by windows
 
 
