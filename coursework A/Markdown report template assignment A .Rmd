@@ -22,7 +22,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## The motivation for the planned research 
 (Max 250 words)
-The coronavirus pandemic has had a great impact on many aspects of society. University education, in particular, has changed significantly. As education in many countries has shifted from physical lectures to online teleconferencing lectures, concerns have been raised with regards to the effectiveness of this method of education. While the technological developments surrounding teleconferencing have enabled an almost seamless transition from offline to online education, it may be that the lack of a physically present lecturer may affect the comprehensibility of the lecture material for students. With this research, we aim to address whether the students' understanding of the lecture material is affected by a different learning setting (i.e., from home watching an online lecture). The results may reveal whether online education is a way to move forward out of the pandemic. Moreover, if the results indicate no significant change in student understanding of material it may open up the way for new form of education, where students could enroll into "digital universities" without needing to be present at any time.
+The coronavirus pandemic has had a great impact on many aspects of society. University education, in particular, has changed significantly. As education in many countries has shifted from physical lectures to online teleconferencing lectures, concerns have been raised with regards to the effectiveness of this method of education. While the technological developments surrounding teleconferencing have enabled an almost seamless transition from offline to online education, it may be that the lack of a physically present lecturer affects the comprehensibility of the lecture material for students. With this research, we aim to address whether the students' understanding of the lecture material is affected by a different learning setting (i.e., from home watching an online lecture). The results may reveal whether online education is a way to move forward out of the pandemic. Moreover, if the results indicate no significant change in student understanding of material it may open up the way for new form of education, where students could enroll into "digital universities" without needing to be present at any time.
 
 ## The theory underlying the research  
 <!-- (Max 250 words) Preferable based on theories reported in literature-->
@@ -35,7 +35,7 @@ Figlio et al. (2013) presented, according to them, the first experimental eviden
 The research question that will be examined in the experiment (or alternatively the hypothesis that will be tested in the experiment)
 -->
 
-Our research question is the following: "How is students' understanding of lecture material affected by attending the lecture live rather than online?"
+Our research question is the following: "How is students' understanding of lecture material affected by attending the lecture live rather than online?". We describe our null hypothesis and alternative hypothesis in the section on suggested statistical analyses.
 
 
 
@@ -78,7 +78,7 @@ In order to determine the difference between live and online lectures on student
 Describe how the experiment will be executed step by step
 -->
 
-First, we ask all students in the class who have agreed to participate in our experiment to perform a pre-test a day before the lecture. The pre-test will consist of questions composed by the teacher giving the lecture. The questions should reflect the main learning goals of the lecture. Ideally, this pre-test is done in a controlled setting on campus. If this is not possible due to governmental restrictions, the pre-test is performed online. All students perform the pre-test at the same time. After the pre-test, students are assigned to either the live lecture condition or the online lecture condition. To reduce unexplained variability, we will opt for a randomized block design. We will divide similar participants into blocks based on their pre-test scores. Then, we randomly assign participants from each block to the live condition or the online condition. Students in both conditions will follow the same lecture at the same time. A day after the lecture, the students perform a post-test. Just like the pre-test, the post-test will consist of questions composed by the teacher giving the lecture and should reflect the main learning goals of the lecture. However, the questions from the pre-test should not be repeated. Again, this post-test is ideally done in a controlled setting on campus, but may have to be performed online. Both the pre-test and the post-test will be graded by the teacher on a scale from 1 to 10.
+First, we ask all students in the class who have agreed to participate in our experiment to perform a pre-test a day before the lecture. The pre-test will consist of questions composed by the teacher giving the lecture. The questions should reflect the main learning goals of the lecture. Ideally, this pre-test is done in a controlled setting on campus. If this is not possible due to governmental restrictions, the pre-test is performed online. All students perform the pre-test at the same time. After the pre-test, students are assigned to either the live lecture condition or the online lecture condition. To reduce unexplained variability, we will opt for a randomized block design. We will divide similar participants into blocks based on their pre-test scores. Then, we randomly assign participants from each block to the live condition or the online condition. Students in both conditions will follow the same lecture at the same time. A day after the lecture, the students perform a post-test. Just like the pre-test, the post-test will consist of questions composed by the teacher giving the lecture and should reflect the main learning goals of the lecture. However, the questions from the pre-test should not be repeated. Again, this post-test is ideally done in a controlled setting on campus, but may have to be performed online. 
 <!--
 Perhaps we could also create groups which do not perform the pre-test to see the influence of this test on the post-test results.
 -->
@@ -108,7 +108,7 @@ First, we determine our null hypothesis $H_0$ and alternative hypothesis $H_1$. 
 
 ### Conceptual model
 <!-- Make a conceptual model for the following research question: Is there a difference in the sentiment of the tweets related to the different celebrities? -->
-![The conceptual model. Different attributes of a celebrity are shown which may influence the sentiment of tweets related to a certain celebrity.]("2.1.png")
+![The conceptual model. Different attributes of a celebrity are shown which may influence the sentiment of tweets related to a certain celebrity.](2.1.png)
 
 ### Collecting tweets, and data preparation
 Include the annotated R script (excluding your personal Keys and Access Tokens information), but put echo=FALSE, so code is not included in the output pdf file.
@@ -118,7 +118,7 @@ Include the annotated R script (excluding your personal Keys and Access Tokens i
 
 #during writing you could add "eval = FALSE",  kntr will than not run this code chunk (take some time do)
 
-setwd("~/OneDrive/Documents/MSc/Q4/Seminar Research Methodology for Data Science/coursework A") 
+setwd("/Users/jessie/OneDrive/Documents/MSc/Q4/Seminar\ Research\ Methodology\ for\ Data\ Science/CS4125-Group10/coursework\ A")
 # apple , note use / instead of \, which used by windows
 
 
@@ -189,9 +189,9 @@ setup_twitter_oauth(consumer_key,consumer_scret, access_token,access_scret) #con
 ##  You should replace this with your own celebrities, at least 3, but more preferred 
 ##  Note that it will take the computer some to collect the tweets
 
-tweets_T <- searchTwitter("#rutte", n=300, lang="en", resultType="recent") #300 recent tweets about Donald Trump, in English (I think that 1500 tweets is max)
-tweets_C <- searchTwitter("#biden", n=300, lang="en", resultType="recent") #300 recent tweets about Hillary Clinton
-tweets_B <- searchTwitter("#putin", n=300, lang="en", resultType="recent") #300 recent tweets about Bernie Sanders
+tweets_J <- searchTwitter("#justinbieber", n=300, lang="en", resultType="recent") #300 recent tweets about Donald Trump, in English (I think that 1500 tweets is max)
+tweets_T <- searchTwitter("#taylorswift", n=300, lang="en", resultType="recent") #300 recent tweets about Hillary Clinton
+tweets_B <- searchTwitter("#billieeilish", n=300, lang="en", resultType="recent") #300 recent tweets about Bernie Sanders
 
 
 
@@ -212,8 +212,8 @@ tweets_B <- searchTwitter("#putin", n=300, lang="en", resultType="recent") #300 
 
 ######################## Sentiment analysis
 
-tweets_T.text <- laply(tweets_T, function(t)t$getText()) #get text out of tweets 
-tweets_C.text <- laply(tweets_C, function(t)t$getText()) #get text out of tweets
+tweets_J.text <- laply(tweets_J, function(t)t$getText()) #get text out of tweets 
+tweets_T.text <- laply(tweets_T, function(t)t$getText()) #get text out of tweets
 tweets_B.text <- laply(tweets_B, function(t)t$getText()) #get text out of tweets
 
 
@@ -226,17 +226,17 @@ source("sentiment3.R") #load algoritm
 # see sentiment3.R form more information about sentiment analysis. It assigns a intereger score
 # by substracitng the number of occurrence of negative words from that of positive words
 
+analysis_J <- score.sentiment(tweets_J.text, pos, neg)
 analysis_T <- score.sentiment(tweets_T.text, pos, neg)
-analysis_C <- score.sentiment(tweets_C.text, pos, neg)
 analysis_B <- score.sentiment(tweets_B.text, pos, neg)
 
 
-sem<-data.frame(analysis_T$score, analysis_C$score, analysis_B$score)
+sem<-data.frame(analysis_J$score, analysis_T$score, analysis_B$score)
 
 
-semFrame <-melt(sem, measured=c(analysis_T.score,analysis_C.score, analysis_B.score ))
+semFrame <-melt(sem, measured=c(analysis_J.score,analysis_T.score, analysis_B.score ))
 names(semFrame) <- c("Candidate", "score")
-semFrame$Candidate <-factor(semFrame$Candidate, labels=c("Donald Trump", "Hillary Clinton", "Bernie Sanders")) # change the labels for your celibrities
+semFrame$Candidate <-factor(semFrame$Candidate, labels=c("Justin Bieber", "Taylor Swift", "Billie Eilish")) # change the labels for your celibrities
 
 #The data you need for the analyses can be found in semFrame
 
@@ -247,6 +247,12 @@ Analyze the homogeneity of variance of sentiments of the tweets of the different
 
 ```{r}
 #include your code and output in the document
+
+library(car)
+
+boxplot(semFrame$score ~ semFrame$Candidate)
+leveneTest(semFrame$score, semFrame$Candidate, center = median)
+
 ```
 
 
@@ -255,6 +261,11 @@ Graphically examine the mean and distribution sentiments of tweets for each cele
 
 ```{r}
 #include your code and output in the document
+
+#library(sm)
+
+#sm.density.compare(data$score, data$Candidate)
+
 ```
 ### Frequentist approach
 
@@ -263,6 +274,9 @@ Use a linear model to analyze whether the knowledge to which celebrity a tweet r
 
 ```{r}
 #include your code and output in the document
+
+
+
 ```
 
 #### Post Hoc analysis
