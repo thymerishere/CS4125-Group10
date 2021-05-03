@@ -118,7 +118,8 @@ Include the annotated R script (excluding your personal Keys and Access Tokens i
 
 #during writing you could add "eval = FALSE",  kntr will than not run this code chunk (take some time do)
 
-setwd("/Users/jessie/OneDrive/Documents/MSc/Q4/Seminar\ Research\ Methodology\ for\ Data\ Science/CS4125-Group10/coursework\ A")
+source("working_dir.R")
+setwd(wd) 
 # apple , note use / instead of \, which used by windows
 
 
