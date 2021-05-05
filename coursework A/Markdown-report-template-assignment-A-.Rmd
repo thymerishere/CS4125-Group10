@@ -326,17 +326,28 @@ m0 <-map2stan(
     mu <- a,
     a ~ dnorm(0, 10),
     sigma ~ dunif(0.0001, 40)),  
-  data =  semFrame ,iter = 30000, chains = 4, cores = 4
+  data =  semFrame ,iter = 10000, chains = 4, cores = 4
 )
 
-m1 <-map2stan( 
-  alist(
-    t_term1 ~ dnorm(mu, sigma), 
-    mu <- a[CandidateF] ,
-    a[CandidateF] ~ dnorm(0, 10), 
-    sigma ~ dunif(0.0001, 40)),  
-  data =  semFrame ,iter = 30000, chains = 4, cores = 4
+m1 <-map2stan(
+ alist(
+   t_term1 ~ dnorm(mu, sigma),
+   mu <- a[CandidateF] ,
+   sigma <-  dunif(0.0001, 40),
+   a[CandidateF] ~ dnorm(0, 10)),
+ data =  semFrame ,iter = 10000, chains = 4, cores = 4
 )
+
+#m1 <-map2stan(
+#  alist(
+#    score~ dnorm(mu, sigma),
+#    mu <-a + b*x,
+#    a ~ dnorm(0, 10),
+#    b ~ dnorm(0, 20),
+  #   x ~ categorical(0.33),
+  #   sigma ~ dunif(0.001, 40)),  
+  # data = semFrame, iter= 10000, chains = 4, cores = 4 
+# )
 
 precis(m1, depth = 2, prob = .95)
 ```
@@ -355,8 +366,20 @@ Make a conceptual model underlying this research question
 Graphically examine the variation in page visits for different factors levels (e.g. histogram, density plot etc.) 
 
 
-```{r}
+```{r fig.asp = 1.4, fig.width = 3}
 #include your code and output in the document
+
+web_visit <- read.csv("webvisit0.csv")
+web_visit$version <- factor(x=web_visit$version, labels=c("old", "new"))
+web_visit$portal <- factor(x=web_visit$portal, labels=c("consumers", "companies"))
+
+# facet_grid(boxplot(web_visit$pages ~ web_visit$portal + web_visit$version))
+library(ggplot2)
+library(magrittr) # needs to be run every time you start R and want to use %>%
+library(dplyr)    # alternatively, this also loads %>%
+p <- web_visit %>% ggplot( aes(y=pages)) + geom_boxplot() + facet_grid(portal ~ version, scales = "free_x", space = "free_x") + theme( axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank()) + labs(title="Boxplots of website visit data")
+
+plot(p)
 ```
 
 
@@ -364,8 +387,15 @@ Graphically examine the variation in page visits for different factors levels (e
 Visually inspect if variable page visits deviates from a Gaussian distribution, and discuss implication for general linear model analysis.
 
 
-```{r}
+```{r fig.asp = 1, fig.width = 6}
 #include your code and output in the document
+
+p <- web_visit %>% ggplot( aes(x=pages)) + geom_histogram(bins=15) + facet_grid(portal ~ version) + theme() + labs(title="Histogram of website visit data")
+
+plot(p)
+
+
+
 ```
 
 ### Frequentist Approach
@@ -376,6 +406,22 @@ Conduct a model analysis, to examine the added values of adding 2 factors and in
 
 ```{r}
 #include your code and output in the document
+library(car)
+library(pander)
+
+leveneTest(web_visit$pages, interaction(web_visit$version , web_visit$portal))
+
+
+model0 <- lm(pages ~ 1 , data = web_visit, na.action = na.exclude)
+model1 <- lm(pages ~ version , data = web_visit, na.action = na.exclude)
+model2 <- lm(pages ~ portal , data = web_visit, na.action = na.exclude)
+model3 <- lm(pages ~ version + portal , data = web_visit, na.action = na.exclude)
+model4 <- lm(pages ~ version + portal + version:portal , data = web_visit, na.action = na.exclude)
+
+pander(anova(model0,model1), caption = "Website version as main effect on page visits")
+pander(anova(model0,model2), caption = "Portal type as main effect on page visits")
+pander(anova(model3,model4),caption = "Interation effect on top of two main effects")
+pander(anova(model4),caption = "Effect of Website version, Portal type and interaction effect on page visits")
 ```
 
 
@@ -385,6 +431,17 @@ If the analysis shows a significant two-way interaction effect, conduct a Simple
 
 ```{r}
 #include your code and output in the document
+web_visit$simple <- interaction(web_visit$version, web_visit$portal) #merge two factors levels(Lec7g$simple) #to see the level in the new factor
+levels(web_visit$simple)
+
+contrastConsumers <-c(1,-1,0,0) #Only the Simple text function data 
+contrastCompanies <-c(0,0,1,-1) #Only the Complex text function data
+
+
+SimpleEff <- cbind(contrastConsumers,contrastCompanies)
+contrasts(web_visit$simple) <- SimpleEff #now we link the two contrasts with the factor simple
+simpleEffectModel <-lm(pages ~ simple , data = web_visit, na.action = na.exclude) 
+pander(summary.lm(simpleEffectModel))
 ```
 
 
@@ -403,6 +460,54 @@ Conduct model analysis and provide brief interpretation of the results
 
 ```{r}
 #include your code and output in the document
+web_visit <- subset(web_visit, select = c(pages,version, portal )) 
+web_visit$versionN <- as.numeric(web_visit$version)
+web_visit$portalN <- as.numeric(web_visit$portal)
+
+
+m0 <-map2stan( alist(
+    pages ~ dnorm(mu, sigma), mu <- a ,
+    a ~ dnorm(4, 2),
+    sigma ~ dunif(0.1, 2)
+  ),  data = web_visit,iter = 10000, chains = 4, cores = 4
+)
+
+
+m1 <-map2stan( alist(
+  pages ~ dnorm(mu, sigma), mu <- a + b*versionN,
+  a ~ dnorm(4, 2),
+  b ~ dnorm(0, 1),
+  sigma ~ dunif(0.1, 2) ), data = web_visit,iter = 10000, chains = 4, cores = 4
+)
+
+  
+m2 <-map2stan( alist(
+  pages ~ dnorm(mu, sigma), mu <- a + c*portalN ,
+  a ~ dnorm(4, 2),
+  c ~ dnorm(0, 1),
+  sigma ~ dunif(0.1, 2)), 
+  data = web_visit,iter = 10000, chains = 4, cores = 4
+)
+
+m3 <-map2stan( alist(
+  pages ~ dnorm(mu, sigma), mu <- a + b*versionN + c*portalN ,
+  a ~ dnorm(4, 2),
+  b ~ dnorm(0, 1),
+  c ~ dnorm(0, 1), sigma ~ dunif(0.1, 2)),  
+  data = web_visit,iter = 10000, chains = 4, cores = 4
+)
+
+m4 <-map2stan( alist(
+  pages ~ dnorm(mu, sigma),
+  mu <- a + b*versionN + c*portalN + d*versionN*portalN, a ~ dnorm(4, 2),
+  c(b,c,d) ~ dnorm(0, 1),
+  sigma ~ dunif(0.1, 2)),  
+  data = web_visit,iter = 10000, chains = 4, cores = 4
+)
+
+compare(m0,m1,m2,m3,m4)
+precis(m4, prob= .95)
+
 ```
 
 
@@ -415,6 +520,25 @@ Use graphics to inspect the distribution of the score, and relationship between 
 
 ```{r}
 #include your code and output in the document
+exp_data = read.csv("set1.csv")
+
+p <- exp_data %>% ggplot( aes(x=score)) + geom_histogram(bins=15) + theme() + labs(title="Histogram of score")
+
+plot(p)
+
+p <- exp_data %>% ggplot( aes(x=session, y=score)) + geom_point(alpha=0.25) + theme() + labs(title="Scatterplot relation between score & session")
+
+plot(p)
+
+library(Rmisc)
+tgc = summarySE(exp_data, measurevar="score", groupvars=c("session"))
+p <- tgc %>% ggplot(aes(x=session, y=score, alpha=N*2)) + 
+    geom_errorbar(aes(ymin=score-se, ymax=score+se), width=.1) +
+    geom_line() +
+    geom_point()
+
+plot(p)
+
 ```
 
 ## Frequentist approach
@@ -428,6 +552,7 @@ Conduct multilevel analysis and calculate 95% confidence intervals, determine:
 
 ```{r}
 #include your code and output in the document
+
 ```
 
 ### Report section for a scientific publication
