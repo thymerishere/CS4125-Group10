@@ -313,43 +313,30 @@ Conduct model analysis and provide brief interpretation of the results
 
 ```{r STAN CHUNK}
 #include your code and output in the document
-library("rstan") 
+library("rstan")
 library("rethinking")
-
 
 semFrame <- subset(semFrame, select = c(score, CandidateF)) 
 
-
-m0 <-map2stan(
+m0 <-ulam(
   alist(
     score ~ dnorm(mu, sigma), 
     mu <- a,
-    a ~ dnorm(0, 10),
-    sigma ~ dunif(0.0001, 40)),  
+    a ~ dnorm(0, 3),
+    sigma ~ dunif(0.0001, 10)),  
   data =  semFrame ,iter = 10000, chains = 4, cores = 4
 )
 
-m1 <-map2stan(
+m1 <-ulam(
  alist(
-   t_term1 ~ dnorm(mu, sigma),
+   score ~ dnorm(mu, sigma),
    mu <- a[CandidateF] ,
-   sigma <-  dunif(0.0001, 40),
+   sigma ~  dunif(0.0001, 10),
    a[CandidateF] ~ dnorm(0, 10)),
- data =  semFrame ,iter = 10000, chains = 4, cores = 4
+ data =  semFrame ,iter = 10000, chains = 4, cores = 4, control=list(adapt_delta=.99), log_lik=TRUE
 )
 
-#m1 <-map2stan(
-#  alist(
-#    score~ dnorm(mu, sigma),
-#    mu <-a + b*x,
-#    a ~ dnorm(0, 10),
-#    b ~ dnorm(0, 20),
-  #   x ~ categorical(0.33),
-  #   sigma ~ dunif(0.001, 40)),  
-  # data = semFrame, iter= 10000, chains = 4, cores = 4 
-# )
-
-precis(m1, depth = 2, prob = .95)
+precis(m1, depth=2, prob = .95)
 ```
 
 #### Comparison celebrity pair
