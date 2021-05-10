@@ -324,7 +324,7 @@ m0 <-ulam(
     mu <- a,
     a ~ dnorm(0, 3),
     sigma ~ dunif(0.0001, 10)),  
-  data =  semFrame ,iter = 10000, chains = 4, cores = 4
+  data =  semFrame ,iter = 10000, chains = 4, cores = 4, control=list(adapt_delta=.99), log_lik=TRUE
 )
 
 m1 <-ulam(
@@ -337,6 +337,7 @@ m1 <-ulam(
 )
 
 precis(m1, depth=2, prob = .95)
+compare(m0, m1, func=WAIC)
 ```
 
 #### Comparison celebrity pair
@@ -594,6 +595,19 @@ Conduct multilevel analysis and calculate 95% confidence intervals, determine:
 ```{r}
 #include your code and output in the document
 
+library(nlme)
+
+model0 <- lme(score ~ 1 , random = ~1|Subject, data = exp_data, method="ML")
+model1 <- lme(score ~ session , random = ~1|Subject, data = exp_data, method="ML")
+# model2 <- lme(score ~ 1 , random = ~session|Subject, data = exp_data, method="ML")
+
+intervals(model0, 0.95)
+intervals(model1, 0.95)
+# intervals(model2, 0.95)
+
+pander(anova(model0,model1), caption = "Adding session as a fixed effect.")
+# pander(anova(model0,model2), caption = "Adding session as a fixed effect and session as a random effect.")
+
 ```
 
 ### Report section for a scientific publication
@@ -611,11 +625,52 @@ Select the first 100 participants from the data set. (hint to overcome the Stan 
 
 ```{r}
 #include your code and output in the document
+
+exp_data_1 = data.frame(exp_data)
+exp_data_1 = exp_data_1[exp_data_1$Subject < 100,]
+exp_data_1$Subject <- exp_data_1$Subject + 1
+
+m0 <-ulam( alist(
+    score ~ dnorm(mu, sigma), 
+    mu <- a ,
+    a ~ dnorm(0, 100),
+    sigma ~ dcauchy(0, 50)
+  ),  data = exp_data_1, iter = 10000, chains = 4, cores = 4, control=list(adapt_delta=.99), log_lik=TRUE
+)
+
+m1 <-ulam( alist(
+    score ~ dnorm(mu, sigma), 
+    mu <- a + a_Subject[Subject] ,
+    
+    a_Subject[Subject] ~ dnorm(0, sigma_Subject),
+    sigma_Subject ~ dcauchy(0, 100),
+    
+    a ~ dnorm(0, 100),
+    sigma ~ dcauchy(0, 50)
+  ),  data = exp_data_1, iter = 10000, chains = 4, cores = 4, control=list(adapt_delta=.99), log_lik=TRUE
+)
+
+m2 <-ulam( alist(
+    score ~ dnorm(mu, sigma), 
+    mu <- a + a_Subject[Subject] + b * session,
+    
+    a_Subject[Subject] ~ dnorm(0, sigma_Subject),
+    sigma_Subject ~ dcauchy(0, 100),
+    
+    a ~ dnorm(0, 100),
+    b ~ dnorm(0, 5),
+    sigma ~ dcauchy(0, 50)
+  ),  data = exp_data_1, iter = 10000, chains = 4, cores = 4, control=list(adapt_delta=.99), log_lik=TRUE
+)
+
+plot(compare(m0,m1,m2))
+# plot(precis(m2, depth=2, prob= .95))
+
 ```
 
 ### Estimates examination
 
-Examine the estimate of parameters of the model with best fitt, and provide a brief interpretation.
+Examine the estimate of parameters of the model with best fit, and provide a brief interpretation.
 
 
 ```{r}
