@@ -108,10 +108,12 @@ First, we determine our null hypothesis $H_0$ and alternative hypothesis $H_1$. 
 
 ### Conceptual model
 <!-- Make a conceptual model for the following research question: Is there a difference in the sentiment of the tweets related to the different celebrities? -->
-![The conceptual model. Different attributes of a celebrity are shown which may influence the sentiment of tweets related to a certain celebrity.](2.1.png)
+![The conceptual model. Different attributes of a celebrity are shown which may influence the sentiment of tweets related to a certain celebrity.](ConceptualModel2.1.pdf)
 
 ### Collecting tweets, and data preparation
-Include the annotated R script (excluding your personal Keys and Access Tokens information), but put echo=FALSE, so code is not included in the output pdf file.
+<!-- Include the annotated R script (excluding your personal Keys and Access Tokens information), but put echo=FALSE, so code is not included in the output pdf file. -->
+<!-- TODO: Dit willen we misschien dubbel checken voordat we hem inleveren -->
+Note from the author: as this data is updated with each run, analyses may not reflect accompanying graphs in certain sections as they were performed on older data.
 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, include = FALSE}
@@ -244,21 +246,24 @@ semFrame$Candidate <-factor(semFrame$Candidate, labels=c("Justin Bieber", "Taylo
 ```
 
 ### Homogeneity of variance analysis
-Analyze the homogeneity of variance of sentiments of the tweets of the different celebrities, and provide interpretation
+<!-- Analyze the homogeneity of variance of sentiments of the tweets of the different celebrities, and provide interpretation -->
+From the boxplot containing the distribution of tweet sentiments for all three celebrities we can conclude that there is a visible difference in sentiment variance, but performing Levene's test verifies this. In the results of that test we can see that they are significant ($p<0.05$), indicating that there is variance inequality between all three groups of tweets.
 
 ```{r}
 #include your code and output in the document
 
 library(car)
+library(pander)
 
 boxplot(semFrame$score ~ semFrame$Candidate)
-leveneTest(semFrame$score, semFrame$Candidate, center = median)
+pander(leveneTest(semFrame$score, semFrame$Candidate, center = median), caption = "Results of performing Levene's test on the three groups of tweets about the three celebrities.")
 
 ```
 
 
 ### Visual inspection Mean and distribution sentiments
-Graphically examine the mean and distribution sentiments of tweets for each celebrity, and provide interpretation
+<!-- Graphically examine the mean and distribution sentiments of tweets for each celebrity, and provide interpretation -->
+Analysing the bar graph of sentiments counts for all tweets for each celebrity, we can see that in general tweets about Justin Bieber are most neutral, with most tweets having a sentiment of either 0 or 0.5, while tweets about Taylor Swift vary greatly, having sentiment values between -1 and 4. Tweets about Billie Eilish are the most negative and also have the most tweets with value 0.
 
 ```{r}
 #include your code and output in the document
@@ -271,7 +276,8 @@ plot(p)
 ### Frequentist approach
 
 #### Linear model
-Use a linear model to analyze whether the knowledge to which celebrity a tweet relates has a significant impact on explaining the sentiments of the tweets. Provide interpretation of results 
+<!-- Use a linear model to analyze whether the knowledge to which celebrity a tweet relates has a significant impact on explaining the sentiments of the tweets. Provide interpretation of results  -->
+The results of performing an F-test on a null model and a model where the celebrity is added as a independent variable show that there is a significant improvement with the latter model with respect to the quality of the fit. This means that knowing the celebrity gives information about the distribution of tweet sentiments in the data set.
 
 ```{r}
 #include your code and output in the document
@@ -279,51 +285,57 @@ library(pander)
 library(multcomp)
 
 semFrame$CandidateF <-factor(semFrame$Candidate, levels =c("Justin Bieber", "Taylor Swift", "Billie Eilish"), labels =c("Justin Bieber", "Taylor Swift", "Billie Eilish"))
-#model0 <-lm(score~1, data = semFrame, na.action = na.exclude)
-#model1 <-lm(score~CandidateF, data = semFrame, na.action = na.exclude)
 
-res.aov <- aov(score ~ Candidate, data=semFrame)
+res.aov <- aov(score ~ Candidate, data=semFrame, na.action=na.exclude)
 
-pander(summary(res.aov))
+pander(res.aov, "Effect pre-post measuring condition on the tweet sentiments of the three celebrities.")
 ```
 
 #### Post Hoc analysis
-If a model that includes the celebrity is better in explaining the sentiments of tweets than a model without such predictor, conduct a post-hoc analysis with e.g. Bonferroni correction, to examine which of celebrity tweets differ from the other celebrity tweets. Provide interpretation of the results
+<!-- If a model that includes the celebrity is better in explaining the sentiments of tweets than a model without such predictor, conduct a post-hoc analysis with e.g. Bonferroni correction, to examine which of celebrity tweets differ from the other celebrity tweets. Provide interpretation of the results -->
+Performing Post Hoc analysis allows us to determine whether there is a significant difference in tweet sentiments between all three celebrities, and how the distribution changes between them. The results, obtained by performing Tukey's Honest Significant Difference test, show that there is a significant difference in tweet sentiments for all three celebrities. Tweets about Taylor Swifts are the most positive, while those about Billie Eilish's are most negative, confirming our findings in the visual inspection.
 
 ```{r}
-
-pander(TukeyHSD(res.aov))
-#include your code and output in the document
-#pairwise.t.test(semFrame$score, semFrame$Candidate, paired = FALSE, p.adjust.method = "bonferroni")
-
+library(stats)
+TukeyHSD(res.aov)
 ```
 
 #### Report section for a scientific publication
-Write a small section for a scientific publication, in which you report the results of the analyses, and explain the conclusions that can be drawn.
+<!-- Write a small section for a scientific publication, in which you report the results of the analyses, and explain the conclusions that can be drawn. -->
+In order to determine whether sentiment of tweets depend on the celebrity they are about, a null model and a model with celebrity added as a independent variable predictor have been constructed. Results showed that the fit was significantly better ($F(2, 897) = 44.39$, p. < 0.01) with the added predictor. We can therefore conclude that the Twitter user base tweets about differently about the three celebrities in the data set. Further analysis using Post Hoc analysis using Tukey's Honest Significant Difference test showed that there is a significant difference in tweet sentiment distribution in all three celebrity pairs, Taylor Swift - Justin Bieber (p. < 0.01), and Billie Eilish - Justin Bieber (p. < 0.01), and Taylor Swift - Billie Eilish (p. < 0.01).
 
 ### Bayesian Approach
 
 #### Model description
 
-Describe the mathematical model fitted on the most extensive model. (hint, look at the mark down file of the lectures to see example on formulate mathematical models in markdown). Justify the priors.
+<!-- Describe the mathematical model fitted on the most extensive model. (hint, look at the mark down file of the lectures to see example on formulate mathematical models in markdown). Justify the priors. -->
+The most complex model tested uses the celebrity as a independent variable to predict the score. As we can expect the tweet sentiments to be normally distributed around 0 with almost all data between -5 and 5 due to the tweet word limit, a normally distributed prior with $\mu=0$ and $\sigma^2 =2$ is used.
+
+```{r}
+semFrame <- subset(semFrame, select = c(score, CandidateF)) 
+
+hist(semFrame$score, main="Sentiment values of all tweets.")
+x <- seq(-5, 5, length=100)
+y <- dnorm(x, mean=0, sd=2)
+plot(x, y, type="l", lwd=1, main="Normal distribution with a mean of 0 and a standard deviation of 2.")
+```
 
 #### Model comparison
 
-Conduct model analysis and provide brief interpretation of the results
+<!-- Conduct model analysis and provide brief interpretation of the results -->
+Comparing the null model with the model using celebrity as a independent variable predictor, we can see that the latter model has a lower WAIC and thus a better fit, indicating that using celebrity as a predictor improves the fit of the model.
 
 ```{r STAN CHUNK}
 #include your code and output in the document
 library("rstan")
 library("rethinking")
 
-semFrame <- subset(semFrame, select = c(score, CandidateF)) 
-
 m0 <-ulam(
   alist(
     score ~ dnorm(mu, sigma), 
     mu <- a,
-    a ~ dnorm(0, 3),
-    sigma ~ dunif(0.0001, 10)),  
+    a ~ dnorm(0, 2),
+    sigma ~ dunif(0.0001, 5)),  
   data =  semFrame ,iter = 10000, chains = 4, cores = 4, control=list(adapt_delta=.99), log_lik=TRUE
 )
 
@@ -331,18 +343,32 @@ m1 <-ulam(
  alist(
    score ~ dnorm(mu, sigma),
    mu <- a[CandidateF] ,
-   sigma ~  dunif(0.0001, 10),
-   a[CandidateF] ~ dnorm(0, 10)),
+   sigma ~  dunif(0.0001, 5),
+   a[CandidateF] ~ dnorm(0, 2)),
  data =  semFrame ,iter = 10000, chains = 4, cores = 4, control=list(adapt_delta=.99), log_lik=TRUE
 )
 
-precis(m1, depth=2, prob = .95)
-compare(m0, m1, func=WAIC)
+pander(precis(m1, depth=2, prob = .95))
+plot(compare(m0, m1, func=WAIC))
 ```
 
 #### Comparison celebrity pair
 
-Compare sentiments of celebrity pairs and provide a brief interpretation (e.g. CIs) 
+<!-- Compare sentiments of celebrity pairs and provide a brief interpretation (e.g. CIs)  -->
+Using the _bayes.t.test_ we can analyse the difference in tweet sentiment distributions for each celebrity pair. From the plots we can deduce that indeed there is a significant ($p < 0.01$) probability that the true distributions of the tweet sentiments for the three celebrities are different from one another.
+
+```{r}
+# Might have to do 'brew install jags' on Mac to make this work.
+library(rjags)
+devtools::install_github("rasmusab/bayesian_first_aid")
+library(BayesianFirstAid)
+jbSub <- subset(semFrame, (CandidateF == "Justin Bieber"))
+tsSub <- subset(semFrame, (CandidateF == "Taylor Swift"))
+beSub <- subset(semFrame, (CandidateF == "Billie Eilish"))
+plot(bayes.t.test(jbSub$score, tsSub$score))
+plot(bayes.t.test(jbSub$score, beSub$score))
+plot(bayes.t.test(tsSub$score, beSub$score))
+```
 
 
 ## Question 2 - Website visits (between groups - Two factors)
