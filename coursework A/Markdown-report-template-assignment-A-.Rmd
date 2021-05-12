@@ -1,12 +1,13 @@
 ---
 title: "Report Template coursework assignment A - 2021"
-subtitle: "CS4125 Seminar Research Methodology for Data Science"
 author: "Thomas Bos (4543408), Daniël van Gelder (4551028), Jessie van Schijndel (5407397)"
 date: "20/04/2021"
 output:
-   pdf_document:
-      fig_caption: true
-      number_sections: true
+  pdf_document:
+    fig_caption: yes
+    number_sections: yes
+  word_document: default
+subtitle: CS4125 Seminar Research Methodology for Data Science
 ---
 
 ```{r setup, include=FALSE}
@@ -501,7 +502,13 @@ A linear model was fitted on the amount of page visits for users of a website, t
 
 Our most extensive Bayesian model captures each individual factor as well as the interaction of the factors and is defined as follows:
 
-$$\text{PageVisits} \sim N(\mu, \sigma) \\ \mu = a + b \cdot \text{Version} + c \cdot \text{Portal} + d\cdot \text{Version} \cdot \text{Portal} \\ a \sim \text{Gamma}(1, 2) \\b \sim N(0, 1) \\ c \sim N(0, 1) \\ d \sim N(0, 1) \\ \sigma \sim U(0.1, 2)$$
+$\text{PageVisits} \sim N(\mu, \sigma)$
+$\mu = a + b \cdot \text{Version} + c \cdot \text{Portal} + d\cdot \text{Version} \cdot \text{Portal}$
+$a \sim \text{Gamma}(1, 2)$
+$b \sim N(0, 1)$
+$c \sim N(0, 1)$
+$d \sim N(0, 1)$
+$\sigma \sim U(0.1, 2)$
 
 Here the functions $\text{Gamma}$, $N$ and $U$ denote the probability functions of the Gamma, Normal and Uniform distributions respectively. 
 
@@ -516,7 +523,7 @@ plot(p)
 <!-- Conduct model analysis and provide brief interpretation of the results -->
 Besides the previously defined model, we defined simpler models which capture the effects of the factors on their own and their joint as well as interaction effect.  
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, results = 'hide', echo=T, cache=TRUE}
 web_visit <- subset(web_visit, select = c(pages,version, portal )) 
 web_visit$versionN <- as.numeric(web_visit$version)
 web_visit$portalN <- as.numeric(web_visit$portal)
@@ -683,7 +690,7 @@ For the prior of the standard deviations $\sigma_\text{Subject}$ and $\sigma$ we
 
 We select the first 100 participants from the data set. Then, we create three models with increasing complexity.
 
-```{r, message=FALSE, warning=FALSE}
+```{r, message=FALSE, warning=FALSE, cache=TRUE}
 exp_data_1 = data.frame(exp_data)
 exp_data_1 = exp_data_1[exp_data_1$Subject < 100,]
 exp_data_1$Subject <- exp_data_1$Subject + 1
