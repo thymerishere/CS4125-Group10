@@ -557,22 +557,26 @@ The WAIC analysis above indicates that the extensive model described at the begi
 # Part 3 - Multilevel model
 
 ## Visual inspection
-Use graphics to inspect the distribution of the score, and relationship between session and score
+<!-- Use graphics to inspect the distribution of the score, and relationship between session and score -->
+For this exericse, we use `set1.csv`. Below we inspect the distribution of the score through a histogram of the score. 
 
-
-```{r}
-#include your code and output in the document
+```{r "Histogram of score"}
 exp_data = read.csv("set1.csv")
-
-p <- exp_data %>% ggplot( aes(x=score)) + geom_histogram(bins=15) + theme() + labs(title="Histogram of score")
-
+p <- exp_data %>% ggplot( aes(x=score)) + geom_histogram(bins=15) + theme()
 plot(p)
+```
+We also inspect the relationship between session and score through a scatterplot.
 
-p <- exp_data %>% ggplot( aes(x=session, y=score)) + geom_point(alpha=0.25) + theme() + labs(title="Scatterplot relation between score & session")
-
+```{r "Scatterplot relation between score & session"}
+p <- exp_data %>% ggplot( aes(x=session, y=score)) + geom_point(alpha=0.25) + theme()
 plot(p)
+```
 
+Lastly we inspect the same relationship through a plot showing the mean score and standard error over sessions.
+
+```{r "Mean score and standard error over sessions."}
 library(Rmisc)
+
 tgc = summarySE(exp_data, measurevar="score", groupvars=c("session"))
 p <- tgc %>% ggplot(aes(x=session, y=score, alpha=N*2)) + 
     geom_errorbar(aes(ymin=score-se, ymax=score+se), width=.1) +
@@ -580,52 +584,81 @@ p <- tgc %>% ggplot(aes(x=session, y=score, alpha=N*2)) +
     geom_point()
 
 plot(p)
-
 ```
 
 ## Frequentist approach
 
 ### Multilevel analysis
+<!--
 Conduct multilevel analysis and calculate 95% confidence intervals, determine:
 
 * If session has an impact on people score
 * If there is significant variance between the participants in their score
+-->
+Below we conduct a multilevel analysis to determine if session has an impact on people's score and to determine if there is a significant variance between the participants in their score. 
+
+The first model, $m_0$, includes a fixed intercept (`~1`) and a random intercept, indicated by `random = 1|Subject`. This model will have a general intercept (the fixed effect intercept) and an intercept for each of the subjects. In the output we see the standard deviation between the random-effect terms, which is 46.53 for the intercept per clinic, and 35.26 for the residuals. The fixed intercept value is 116.81.
 
 
 ```{r}
-#include your code and output in the document
-
 library(nlme)
 
 model0 <- lme(score ~ 1 , random = ~1|Subject, data = exp_data, method="ML")
-model1 <- lme(score ~ session , random = ~1|Subject, data = exp_data, method="ML")
-# model2 <- lme(score ~ 1 , random = ~session|Subject, data = exp_data, method="ML")
+summary(model0)
+```
 
+We also inspect the 95% confidence interval. We see that 0 is not included in the intervals, therefore the found effects seem to be significant. We conclude that there is significant variance between participants in their score.
+
+```{r}
 intervals(model0, 0.95)
+```
+
+The second model $m_1$ includes the variable `session`. The summary function shows an estimated fixed effect for session on the score of 0.37. With a p-value of 0.0 this fixed effect is significant.
+
+```{r}
+model1 <- lme(score ~ session , random = ~1|Subject, data = exp_data, method="ML")
+summary(model1)
+```
+
+Inspecting the 95% confidence intervals, we can again confirm that the effects are significant, since the intervals do not include 0. We conclude that session has an impact on people's score.
+
+```{r}
 intervals(model1, 0.95)
-# intervals(model2, 0.95)
+```
 
-pander(anova(model0,model1), caption = "Adding session as a fixed effect.")
-# pander(anova(model0,model2), caption = "Adding session as a fixed effect and session as a random effect.")
-
+```{r}
+pander(anova(model0, model1), caption = "Model comparison.")
 ```
 
 ### Report section for a scientific publication
+<!--
 Write a small section for a scientific publication, in which you report the results of the analyses, and explain the conclusions that can be drawn.
+-->
+There was a significant relationship between session and score, $M = 116.8139$ (95% CI 112.70, 120.93), $p = 0$. The relationship between score and session showed significant variance in intercepts across subjects, $SD = 46.51$ (95% CI 43.67, 49.54), $p = 0$. 
 
 ## Bayesian approach
 
 ### Model description
-
+<!--
 Describe the mathematical model fitted on the most extensive model. (hint, look at the mark down file of the lectures to see example on formulate mathematical models in markdown). Justify the priors.
+-->
+In most extensive mathematical model, the score is drawn from a normal distribution with mean $\mu$ and standard deviation $\sigma$. Parameter $\mu$ is created through a linear equation involving parameters $a$ (an intercept), $a_\text{Subject}$ (a subject-specific intercept) and $b$ multiplied by $\text{session}$. 
+
+$\text{Score} \sim N(\mu, \sigma)$
+$\mu = a + a_\text{Subject}[Subject] + b * \text{session}$
+$a_\text{Subject}[Subject] \sim N(0, \sigma_\text{Subject})$
+$\sigma_\text{Subject} \sim \text{Cauchy}(0, 100)T(0, \inf)$
+$a \sim N(0, 100)$
+$b \sim N(0, 5)$
+$\sigma \sim \text{Cauchy}(0,50)T(0, \inf)$
+
+For the prior of the standard deviations $\sigma_\text{Subject}$ and $\sigma$ we use a half Cauchy distribution. We use a Cauchy distrubtion with a large scale value, since we do not have much prior knowledge or belief about the true parameters. With this large scale, the half Cauchy distribution has, unlike the normal distribution, fat tails. This makes the distribution over values away from the mean more uniform than in a normal distribution. For parameters $a$, $a_\text{Subject}$ and $b$ we chose to use a normal distribution as prior.
 
 ### Model comparison
 
-Select the first 100 participants from the data set. (hint to overcome the Stan problem with a zero index, increase subject id number with 1). Compare models with with increasing complexity. 
+We select the first 100 participants from the data set. Then, we create three models with increasing complexity.
 
-```{r}
-#include your code and output in the document
-
+```{r, message=FALSE, warning=FALSE}
 exp_data_1 = data.frame(exp_data)
 exp_data_1 = exp_data_1[exp_data_1$Subject < 100,]
 exp_data_1$Subject <- exp_data_1$Subject + 1
@@ -663,18 +696,22 @@ m2 <-ulam( alist(
   ),  data = exp_data_1, iter = 10000, chains = 4, cores = 4, control=list(adapt_delta=.99), log_lik=TRUE
 )
 
-plot(compare(m0,m1,m2))
-# plot(precis(m2, depth=2, prob= .95))
-
+compare(m0,m1,m2)
 ```
+```{r "Comparing three Bayesian models of increasing complexity."}
+plot(compare(m0,m1,m2))
+```
+
+
+From the plot we can see that models $m_1$ and $m_2$ outperform model $m_0$. However, there is not much of a difference between $m_1$ and $m_2$. The effective number of parameters ($pWAIC$) increases for both these models.
 
 ### Estimates examination
 
-Examine the estimate of parameters of the model with best fit, and provide a brief interpretation.
+Below we examine the estimate of parameters of the model with best fit, which is $m_2$. We see that the uncertainty for parameters $\sigma_\text{Subject}$ and $a$ is relatively high compared to that for parameters $b$ and $\sigma$. Since the value for $b$ is close to zero, it seems that session does not impact score.
 
 
-```{r}
-#include your code and output in the document
+```{r, "Parameters of m2."}
+plot(m2)
 ```
 
 
