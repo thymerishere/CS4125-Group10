@@ -379,32 +379,29 @@ plot(bayes.t.test(tsSub$score, beSub$score))
 ### Visual inspection
 <!--Graphically examine the variation in page visits for different factors levels (e.g. histogram, density plot etc.)-->
 The first step in our inspection is to observe the distribution Dependent Variable overall regardless of the factors.
-```{r}
-#include your code and output in the document
-# facet_grid(boxplot(web_visit$pages ~ web_visit$portal + web_visit$version))
+
+```{r, message=FALSE, warning=FALSE}
 library(ggplot2)
-library(magrittr) # needs to be run every time you start R and want to use %>%
-library(dplyr)    # alternatively, this also loads %>%
+library(magrittr)
+library(dplyr)     
 web_visit <- read.csv("webvisit0.csv")
 web_visit$version <- factor(x=web_visit$version, labels=c("old", "new"))
 web_visit$portal <- factor(x=web_visit$portal, labels=c("consumers", "companies"))
 ```
 
-```{r fig.asp = 1.4, fig.width = 3}
-p <- web_visit %>% ggplot(aes(x=pages)) + geom_histogram(bins=10) + labs(title="Histogram of website page visits over all data")
-
+```{r, warning=FALSE, message=FALSE, fig.cap="Histogram showing page visits on the website over all factors."}
+p <- web_visit %>% ggplot(aes(x=pages)) + geom_histogram(bins=10)
 plot(p)
 ```
 To determine whether either of the IV's have an effect on the distribution of the page visits we observe the distributions under different instantiations of the IV's in the following figure:
-```{r}
-p <- web_visit %>% ggplot( aes(x=pages)) + geom_histogram(bins=10) + facet_grid(portal ~ version) + labs(title="Histograms of website visit data per factor of IV's")
 
+```{r, warning=FALSE, message=FALSE, fig.cap="Histograms of page visits on the website per independent variable."}
+p <- web_visit %>% ggplot( aes(x=pages)) + geom_histogram(bins=10) + facet_grid(portal ~ version)
 plot(p)
 ```
 To further assist our understanding of the distribution we will also draw boxplots of the same data to observe differences in the distribution:
-```{r}
-p <- web_visit %>% ggplot( aes(y=pages)) + geom_boxplot() + facet_grid(portal ~ version, scales = "free_x", space = "free_x") + theme( axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank()) + labs(title="Boxplots of website page visits per factor of IV's")
-
+```{r, warning=FALSE, message=FALSE, fig.cap="Boxplots of page visits on the website per independent variable"}
+p <- web_visit %>% ggplot( aes(y=pages)) + geom_boxplot() + facet_grid(portal ~ version, scales = "free_x", space = "free_x") + theme( axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank())
 plot(p)
 ```
 Based on the figures it seems that the IV's do affect the distribution of the DV. While the distributions between the old and new website for consumers does not show a very clearly different distributions, in the other cases there seems to be a significant difference. In particular, the distributions over the old and new website for companies shows a clearly different distribution in the histograms as well as in the boxplots. 
@@ -413,12 +410,13 @@ Based on the figures it seems that the IV's do affect the distribution of the DV
 <!--Visually inspect if variable page visits deviates from a Gaussian distribution, and discuss implication for general linear model analysis.-->
 
 Again, we take the histogram of the distribution of all data and try to fit a normal distribution to the data. Here, we have taken a normal distribution with as $\mu$ parameter the average of the data and as $\sigma$ the variance of the data. 
-```{r fig.asp = 1, fig.width = 6}
-#include your code and output in the document
+```{r, message=FALSE, warning=FALSE}
 m<-mean(web_visit$pages)
 std<-sqrt(var(web_visit$pages))
+```
 
-p <- web_visit %>% ggplot( aes(x=pages)) + geom_histogram(aes(y =..density..), bins=15) + stat_function(fun = dnorm, args = list(mean = mean(web_visit$pages), sd = sd(web_visit$pages))) + labs(title="Normal distribution fitted to data of page visits")
+```{r, message=FALSE, warning=FALSE, fig.cap="Normal distribution fitted to data of page visits"}
+p <- web_visit %>% ggplot( aes(x=pages)) + geom_histogram(aes(y =..density..), bins=15) + stat_function(fun = dnorm, args = list(mean = mean(web_visit$pages), sd = sd(web_visit$pages)))
 
 plot(p)
 ```
@@ -430,27 +428,27 @@ The figure shows that the distribution of the data does not fit to a normal dist
 <!--Conduct a model analysis, to examine the added values of adding 2 factors and interaction between the factors in the model to predict page visits, and include brief interpretation of the results.-->
 First we perform Levene's Test to determine the homogeneity of variance. 
 
+
 ```{r}
-#include your code and output in the document
 library(car)
 library(pander)
 
-leveneTest(web_visit$pages, interaction(web_visit$version , web_visit$portal))
-
+pander(leveneTest(web_visit$pages, interaction(web_visit$version , web_visit$portal)))
 ```
 The p-value of Levene's Test in this case is larger than 0.05 and this thus indicates that the variance are homogeneous. Our assumptions on the data which allows for linear model fitting still hold.
 
 The following tables show the results of fittings linear models and comparing them using ANOVA.
 
 The first table shows whether adding the website version as a predictor for the page visits has a significant effect. The results show indeed that there is a significant effect. The second table indicates the same, but in this case for the portal of the website (i.e. market), this effect is also significant. The third table indicates whether there is an interaction effect between the two factors, which is also significantly demonstrated. The final table shows the combined effect of the two factors as well as the interaction.
-```{r}
 
+```{r, warning=FALSE, message=FALSE}
 model0 <- lm(pages ~ 1 , data = web_visit, na.action = na.exclude)
 model1 <- lm(pages ~ version , data = web_visit, na.action = na.exclude)
 model2 <- lm(pages ~ portal , data = web_visit, na.action = na.exclude)
 model3 <- lm(pages ~ version + portal , data = web_visit, na.action = na.exclude)
 model4 <- lm(pages ~ version + portal + version:portal , data = web_visit, na.action = na.exclude)
-
+```
+```{r}
 pander(anova(model0,model1), caption = "Website version as main effect on page visits")
 pander(anova(model0,model2), caption = "Portal type as main effect on page visits")
 pander(anova(model3,model4),caption = "Interation effect on top of two main effects")
@@ -458,11 +456,15 @@ pander(anova(model4),caption = "Effect of Website version, Portal type and inter
 ```
 The results justify a further investigation into the effects of the factors. However, we will first also evaluate the goodness of fit of the final statistical model through a Akaike Information Criterion (AIC) comparison:
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 library(AICcmodavg)
 models <-list(model0, model1, model2, model3, model4)
 model.names <-c("model0","model1","model2","model3","model4")
-aictab(cand.set = models, modnames=model.names)
+```
+
+
+```{r}
+pander(aictab(cand.set = models, modnames=model.names))
 ```
 The analysis shows that the final model had the best goodness of fit and, in fact, captures all predictive power that could be found in the full set of models. 
 
@@ -471,15 +473,14 @@ The analysis shows that the final model had the best goodness of fit and, in fac
 As we have previously found a two-way interaction effect between the version and portal factors of the experiment, we will conduct a Simple Effect analysis to explore this interaction effect. 
 
 The following bar plot shows how the page visits vary over the factors.
-```{r}
+```{r, warning=FALSE, message=FALSE, fig.cap="Bar plot showing the mean page visits per independent variable."}
 bar <- ggplot(web_visit, aes(portal , pages, fill = version))
 bar + stat_summary(fun.y = mean, geom = "bar", position="dodge")
 
 ```
-The plot clearly shows that there is a greater difference between the old and new versions of the website for the company portal. To Simple effect analysis will be conducted through contrasts on the consumer and company variables.
+The plot clearly shows that there is a greater difference between the old and new versions of the website for the company portal. The Simple effect analysis will be conducted through a linear model fitted to contrasts on the consumer and company variables.
 
-```{r}
-#include your code and output in the document
+```{r, warning=FALSE, message=FALSE}
 web_visit$simple <- interaction(web_visit$version, web_visit$portal) #merge two factors levels(Lec7g$simple) #to see the level in the new factor
 levels(web_visit$simple)
 
@@ -488,10 +489,14 @@ contrastCompanies <-c(0,0,1,-1) #Only the company portal data
 
 
 SimpleEff <- cbind(contrastConsumers,contrastCompanies)
-contrasts(web_visit$simple) <- SimpleEff #now we link the two contrasts with the factor simple
+contrasts(web_visit$simple) <- SimpleEff 
+```
+
+```{r, warning=FALSE, message=FALSE}
 simpleEffectModel <-lm(pages ~ simple , data = web_visit, na.action = na.exclude) 
 pander(summary.lm(simpleEffectModel))
 ```
+
 The Simple effect analysis demonstrates no significant difference between page visits for users in the consumer portal using new and old versions of the website. However, it demonstrates that there is a significant difference for users in the company portal.
 
 #### Report section for a scientific publication
@@ -504,31 +509,25 @@ A linear model was fitted on the amount of page visits for users of a website, t
 #### Model description
 <!-- Describe the mathematical model fitted on the most extensive model. (hint, look at the mark down file of the lectures to see example on formulate mathematical models in markdown). Justify the priors. -->
 
-```{r}
-summary(web_visit$pages)
-var(web_visit$pages)
-```
-
 Our most extensive Bayesian model captures each individual factor as well as the interaction of the factors and is defined as follows:
 
-$\text{PageVisits} \sim N(\mu, \sigma)$
-$\mu = a + b \cdot \text{Version} + c \cdot \text{Portal} + d\cdot \text{Version} \cdot \text{Portal}$
-$a \sim N(2.7, 3.2)$
-$b \sim N(0, 1)$
-$c \sim N(0, 1)$
-$d \sim N(0, 1)$
-$\sigma \sim U(0.1, 2)$
+$$\text{PageVisits} \sim N(\mu, \sigma) \\ \mu = a + b \cdot \text{Version} + c \cdot \text{Portal} + d\cdot \text{Version} \cdot \text{Portal} \\ a \sim \text{Gamma}(1, 2) \\b \sim N(0, 1) \\ c \sim N(0, 1) \\ d \sim N(0, 1) \\ \sigma \sim U(0.1, 2)$$
 
-Here the functions $N$ and $U$ denote the probability functions of the Normal and Uniform distribution respectively. 
+Here the functions $\text{Gamma}$, $N$ and $U$ denote the probability functions of the Gamma, Normal and Uniform distributions respectively. 
 
+The Gamma distribution was chosen as a prior as previous plots of the page visits shows the distribution to follow a Gamma distribution. By means of visual inspection the parameters shape $k=1$ and scale $\theta=2$ were chosen. See the figure below for a fit of the distribution to the data with these parameters.
+
+```{r, warning=FALSE, message=FALSE, fig.cap="Gamma distribution (1, 2) fitted to data of page visits"}
+p <- web_visit %>% ggplot( aes(x=pages)) + geom_histogram(aes(y =..density..), bins=15) + stat_function(fun = dgamma, args = list(shape = 1, scale=2))
+plot(p)
+```
 
 #### Model comparison
 
 <!-- Conduct model analysis and provide brief interpretation of the results -->
 Besides the previously defined model, we defined simpler models which capture the effects of the factors on their own and their joint as well as interaction effect.  
 
-```{r}
-#include your code and output in the document
+```{r, warning=FALSE, message=FALSE}
 web_visit <- subset(web_visit, select = c(pages,version, portal )) 
 web_visit$versionN <- as.numeric(web_visit$version)
 web_visit$portalN <- as.numeric(web_visit$portal)
@@ -536,7 +535,7 @@ web_visit$portalN <- as.numeric(web_visit$portal)
 
 m0 <-map2stan( alist(
     pages ~ dnorm(mu, sigma), mu <- a ,
-    a ~ dnorm(2.7, 3.2),
+    a ~ dgamma(shape=1, scale=2),
     sigma ~ dunif(0.1, 2)
   ),  data = web_visit,iter = 10000, chains = 4, cores = 4
 )
@@ -544,7 +543,7 @@ m0 <-map2stan( alist(
 
 m1 <-map2stan( alist(
   pages ~ dnorm(mu, sigma), mu <- a + b*versionN,
-  a ~ dnorm(2.7, 3.2),
+    a ~ dgamma(shape=1, scale=2),
   b ~ dnorm(0, 1),
   sigma ~ dunif(0.1, 2) ), data = web_visit,iter = 10000, chains = 4, cores = 4
 )
@@ -552,7 +551,7 @@ m1 <-map2stan( alist(
   
 m2 <-map2stan( alist(
   pages ~ dnorm(mu, sigma), mu <- a + c*portalN ,
-  a ~ dnorm(2.7, 3.2),
+    a ~ dgamma(shape=1, scale=2),
   c ~ dnorm(0, 1),
   sigma ~ dunif(0.1, 2)), 
   data = web_visit,iter = 10000, chains = 4, cores = 4
@@ -560,7 +559,7 @@ m2 <-map2stan( alist(
 
 m3 <-map2stan( alist(
   pages ~ dnorm(mu, sigma), mu <- a + b*versionN + c*portalN ,
-  a ~ dnorm(2.7, 3.2),
+    a ~ dgamma(shape=1, scale=2),
   b ~ dnorm(0, 1),
   c ~ dnorm(0, 1), sigma ~ dunif(0.1, 2)),  
   data = web_visit,iter = 10000, chains = 4, cores = 4
@@ -569,18 +568,26 @@ m3 <-map2stan( alist(
 m4 <-map2stan( alist(
   pages ~ dnorm(mu, sigma),
   mu <- a + b*versionN + c*portalN + d*versionN*portalN, 
-  a ~ dnorm(2.7, 3.2),
+    a ~ dgamma(shape=1, scale=2),
   c(b,c,d) ~ dnorm(0, 1),
   sigma ~ dunif(0.1, 2)),  
   data = web_visit,iter = 10000, chains = 4, cores = 4
 )
 ```
 
-```{r}
+The figure below demonstrates the differences in WAIC between varying models. Here, `m0` is a model with just the prior, `m1` is a model capturing the effect of the website version, `m2` captures the effect of the portal, `m3` captures the effects of both the version and the portal and `m4` represents the model described earlier.
+
+```{r, warning=FALSE, message=FALSE, fig.cap="WAIC comparison between Bayesian models capturing effects of different variables."}
+plot(compare(m0,m1,m2,m3,m4, func=WAIC))
+```
+
+
+```{r, warning=FALSE, message=FALSE}
 pander(compare(m0,m1,m2,m3,m4))
 pander(precis(m4, prob= .95))
 ``` 
-The WAIC analysis above indicates that the extensive model described at the beginning of the section has the best goodness of fit according to the WAIC comparison. The table below the WAIC comparisons shows the 95% credible intervals for all the model parameters. The only parameter that has null in its credible interval is the $a$ parameter which is the intercept. This indicates that it is insignificant. 
+
+The WAIC analysis above indicates that the extensive model described at the beginning of the section has the best goodness of fit according to the WAIC score. The table below the WAIC comparisons shows the 95% credible intervals for all the model parameters. As the null is not present in any of the variables' 95% credible intervals, we deem the results significant.
 
 # Part 3 - Multilevel model
 
