@@ -213,10 +213,10 @@ From the boxplot containing the distribution of tweet sentiments for all three c
 library(car)
 library(pander)
 ```
-```{r "Boxplot of the sentiment values of the tweets for each celebrity."}
+```{r, fig.cap="Boxplot of the sentiment values of the tweets for each celebrity."}
 boxplot(semFrame$score ~ semFrame$Candidate)
 ```
-```{r "Results of performing Levene's test on the three groups of tweets about the three celebrities."}
+```{r, fig.cap="Results of performing Levene's test on the three groups of tweets about the three celebrities."}
 pander(leveneTest(semFrame$score, semFrame$Candidate, center = median))
 ```
 
@@ -229,7 +229,7 @@ library(ggplot2)
 
 p <- semFrame %>% ggplot( aes(x=score)) + geom_histogram( color="#e9ecef", alpha=0.6, position = 'identity') + facet_grid(. ~ Candidate)
 ```
-```{r "Bar plot for the tweet sentiment values for each celebrity."}
+```{r, fig.cap="Bar plot for the tweet sentiment values for each celebrity."}
 plot(p)
 ```
 
@@ -248,7 +248,7 @@ semFrame$CandidateF <-factor(semFrame$Candidate, levels =c("Justin Bieber", "Tay
 
 res.aov <- aov(score ~ Candidate, data=semFrame, na.action=na.exclude)
 ```
-``` {r "Effect pre-post measuring condition on the tweet sentiments of the three celebrities."}
+``` {r fig.cap="Effect pre-post measuring condition on the tweet sentiments of the three celebrities."}
 pander(res.aov)
 ```
 
@@ -259,7 +259,7 @@ Performing Post Hoc analysis allows us to determine whether there is a significa
 ```{r, message=FALSE, warning=FALSE, echo = T, results = 'hide', cache=TRUE}
 library(stats)
 ```
-```{r "Results of performing Tukey's HSD."}
+```{r, fig.cap="Results of performing Tukey's HSD."}
 TukeyHSD(res.aov)
 ```
 
@@ -282,11 +282,11 @@ x <- seq(-5, 5, length=100)
 y <- dnorm(x, mean=0, sd=2)
 ```
 
-```{r "Sentiment values of all tweets."}
+```{r, fig.cap="Sentiment values of all tweets."}
 hist(semFrame$score)
 ```
 
-```{r "Normal distribution with a mean of 0 and a standard deviation of 2."}
+```{r, fig.cap="Normal distribution with a mean of 0 and a standard deviation of 2."}
 plot(x, y, type="l", lwd=1)
 ```
 
@@ -321,11 +321,11 @@ m1 <-ulam(
 
 ```
 
-```{r "Confidence intervals for the parameters of the model with celebrity added as a predictor."}
+```{r fig.cap="Confidence intervals for the parameters of the model with celebrity added as a predictor."}
 plot(precis(m1, depth=2, prob = .95))
 ```
 
-```{r "Comparison of the WAIC score for each model."}
+```{r fig.cap="Comparison of the WAIC score for each model."}
 plot(compare(m0, m1, func=WAIC))
 ```
 
@@ -344,15 +344,15 @@ tsSub <- subset(semFrame, (CandidateF == "Taylor Swift"))
 beSub <- subset(semFrame, (CandidateF == "Billie Eilish"))
 ```
 
-``` {r "Results of performing the bayes t-test on the pair Justin Bieber - Taylor Swift."}
+``` {r, fig.cap="Results of performing the bayes t-test on the pair Justin Bieber - Taylor Swift."}
 plot(bayes.t.test(jbSub$score, tsSub$score))
 ```
 
-``` {r "Results of performing the bayes t-test on the pair Justin Bieber - Billie Eilish."}
+``` {r, fig.cap="Results of performing the bayes t-test on the pair Justin Bieber - Billie Eilish."}
 plot(bayes.t.test(jbSub$score, beSub$score))
 ```
 
-``` {r "Results of performing the bayes t-test on the pair Taylor Swift - Billie Eilish."}
+``` {r, fig.cap="Results of performing the bayes t-test on the pair Taylor Swift - Billie Eilish."}
 plot(bayes.t.test(tsSub$score, beSub$score))
 ```
 
@@ -591,7 +591,7 @@ The WAIC analysis above indicates that the extensive model described at the begi
 <!-- Use graphics to inspect the distribution of the score, and relationship between session and score -->
 For this exericse, we use `set1.csv`. Below we inspect the distribution of the score through a histogram of the score. 
 
-```{r "Histogram of score"}
+```{r, fig.cap="Histogram of score"}
 exp_data = read.csv("set1.csv")
 p <- exp_data %>% ggplot( aes(x=score)) + geom_histogram(bins=15) + theme()
 plot(p)
@@ -599,14 +599,14 @@ plot(p)
 
 We also inspect the relationship between session and score through a scatterplot.
 
-```{r "Scatterplot relation between score & session"}
+```{r, fig.cap="Scatterplot relation between score and session"}
 p <- exp_data %>% ggplot( aes(x=session, y=score)) + geom_point(alpha=0.25) + theme()
 plot(p)
 ```
 
 Lastly we inspect the same relationship through a plot showing the mean score and standard error over sessions.
 
-```{r "Mean score and standard error over sessions."}
+```{r, fig.cap="Mean score and standard error over sessions."}
 library(Rmisc)
 
 tgc = summarySE(exp_data, measurevar="score", groupvars=c("session"))
@@ -730,7 +730,7 @@ m2 <-ulam( alist(
 
 compare(m0,m1,m2)
 ```
-```{r "Comparing three Bayesian models of increasing complexity."}
+```{r fig.cap="Comparing three Bayesian models of increasing complexity."}
 plot(compare(m0,m1,m2))
 ```
 
@@ -742,7 +742,7 @@ From the plot we can see that models $m_1$ and $m_2$ outperform model $m_0$. How
 Below we examine the estimate of parameters of the model with best fit, which is $m_2$. We see that the uncertainty for parameters $\sigma_\text{Subject}$ and $a$ is relatively high compared to that for parameters $b$ and $\sigma$. Since the value for $b$ is close to zero, it seems that session does not impact score.
 
 
-```{r, "Parameters of m2."}
+```{r, fig.cap="Parameters of m2."}
 plot(m2)
 ```
 
