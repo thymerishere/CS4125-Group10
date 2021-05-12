@@ -247,7 +247,7 @@ semFrame$Candidate <-factor(semFrame$Candidate, labels=c("Justin Bieber", "Taylo
 <!-- Analyze the homogeneity of variance of sentiments of the tweets of the different celebrities, and provide interpretation -->
 From the boxplot containing the distribution of tweet sentiments for all three celebrities we can conclude that there is a visible difference in sentiment variance, but performing Levene's test verifies this. In the results of that test we can see that they are significant ($p<0.05$), indicating that there is variance inequality between all three groups of tweets.
 
-```{r, message=FALSE, warning=FALSE, echo = T, results = 'hide', cache=TRUE}
+```{r, message=FALSE, warning=FALSE, echo = T, results = 'hide'}
 #include your code and output in the document
 
 library(car)
@@ -257,7 +257,7 @@ library(pander)
 boxplot(semFrame$score ~ semFrame$Candidate)
 ```
 ```{r "Results of performing Levene's test on the three groups of tweets about the three celebrities."}
- pander(leveneTest(semFrame$score, semFrame$Candidate, center = median))
+pander(leveneTest(semFrame$score, semFrame$Candidate, center = median))
 ```
 
 
@@ -306,7 +306,7 @@ TukeyHSD(res.aov)
 
 #### Report section for a scientific publication
 <!-- Write a small section for a scientific publication, in which you report the results of the analyses, and explain the conclusions that can be drawn. -->
-In order to determine whether sentiment of tweets depend on the celebrity they are about, a null model and a model with celebrity added as a independent variable predictor have been constructed. Results showed that the fit was significantly better ($F(2, 897) = 44.39$, p. < 0.01) with the added predictor. We can therefore conclude that the Twitter user base tweets about differently about the three celebrities in the data set. Further analysis using Post Hoc analysis using Tukey's Honest Significant Difference test showed that there is a significant difference in tweet sentiment distribution in all three celebrity pairs, Taylor Swift - Justin Bieber (p. < 0.01), and Billie Eilish - Justin Bieber (p. < 0.01), and Taylor Swift - Billie Eilish (p. < 0.01).
+In order to determine whether sentiment of tweets depend on the celebrity they are about, a null model and a model with celebrity added as a independent variable predictor have been constructed. Results showed that the fit was significantly better ($F(2, 897) = 44.39$, p. < 0.01) with the added predictor. We can therefore conclude that the Twitter user base tweets differently depending on the three celebrities in the data set. Further analysis using Post Hoc analysis using Tukey's Honest Significant Difference test showed that there is a significant difference in tweet sentiment distribution in all three celebrity pairs, Taylor Swift - Justin Bieber (p. < 0.01), and Billie Eilish - Justin Bieber (p. < 0.01), and Taylor Swift - Billie Eilish (p. < 0.01).
 
 ### Bayesian Approach
 
@@ -334,7 +334,7 @@ plot(x, y, type="l", lwd=1)
 #### Model comparison
 
 <!-- Conduct model analysis and provide brief interpretation of the results -->
-As 0 is in none of the confidence intervals for $a_1, a_2,$ and $a_3$, we can conclude that the distribution of tweet sentiments for all three celebrities vary significantly from the prior we have given. Furthermore, comparing the null model with the model using celebrity as a independent variable predictor, we can see that the latter model has a lower WAIC and thus a better fit, indicating that using celebrity as a predictor improves the fit of the model.
+Analysing the parameters $a_1, a_2,$ and $a_3$, we can conclude that the means of the distributions of tweet sentiments vary significantly between each of the three celebrities. Furthermore, comparing the null model with the model using celebrity as a independent variable predictor, we can see that the latter model has a lower WAIC and thus a better fit, indicating that using celebrity as a predictor improves the fit of the model.
 
 ```{r, message=FALSE, warning=FALSE, echo = T, results = 'hide', cache=TRUE}
 # ```{r STAN CHUNK}
@@ -363,7 +363,7 @@ m1 <-ulam(
 ```
 
 ```{r "Confidence intervals for the parameters of the model with celebrity added as a predictor."}
-pander(precis(m1, depth=2, prob = .95))
+plot(precis(m1, depth=2, prob = .95))
 ```
 
 ```{r "Comparison of the WAIC score for each model."}
@@ -430,7 +430,7 @@ To further assist our understanding of the distribution we will also draw boxplo
 p <- web_visit %>% ggplot( aes(y=pages)) + geom_boxplot() + facet_grid(portal ~ version, scales = "free_x", space = "free_x") + theme( axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank())
 plot(p)
 ```
-Based on the figures it seems that the IV's do affect the distribution of the DV. While the distributions between the old and new website for consumers does not show a very clearly different distributions, in the other cases there seems to be a significant difference. In particular, the distributions over the old and new website for companies shows a clearly different distribution in the histograms as well as in the boxplots. 
+Based on the figures it seems that the IV's do affect the distribution of the DV. While the distributions between the old and new website for consumers do not show clearly different distributions, in the other cases there seems to be a significant difference. In particular, the distributions over the old and new website for companies shows a clearly different distribution in the histograms as well as in the boxplots. 
 
 ### Normality check
 <!--Visually inspect if variable page visits deviates from a Gaussian distribution, and discuss implication for general linear model analysis.-->
@@ -461,7 +461,7 @@ library(pander)
 
 pander(leveneTest(web_visit$pages, interaction(web_visit$version , web_visit$portal)))
 ```
-The p-value of Levene's Test in this case is larger than 0.05 and this thus indicates that the variance are homogeneous. Our assumptions on the data which allows for linear model fitting still hold.
+The p-value of Levene's Test in this case is larger than 0.05 and this thus indicates that the variance is homogeneous. Our assumptions on the data which allows for linear model fitting still hold.
 
 The following tables show the results of fittings linear models and comparing them using ANOVA.
 
@@ -719,7 +719,7 @@ $a \sim N(0, 100)$
 $b \sim N(0, 5)$
 $\sigma \sim \text{Cauchy}(0,50)T(0, \inf)$
 
-For the prior of the standard deviations $\sigma_\text{Subject}$ and $\sigma$ we use a half Cauchy distribution. We use a Cauchy distrubtion with a large scale value, since we do not have much prior knowledge or belief about the true parameters. With this large scale, the half Cauchy distribution has, unlike the normal distribution, fat tails. This makes the distribution over values away from the mean more uniform than in a normal distribution. For parameters $a$, $a_\text{Subject}$ and $b$ we chose to use a normal distribution as prior.
+For the prior of the standard deviations $\sigma_\text{Subject}$ and $\sigma$ we use a half Cauchy distribution. We use a Cauchy distribution with a large scale value, since we do not have much prior knowledge or belief about the true parameters. With this large scale, the half Cauchy distribution has, unlike the normal distribution, fat tails. This makes the distribution over values away from the mean more uniform than in a normal distribution. For parameters $a$, $a_\text{Subject}$ and $b$ we chose to use a normal distribution as prior.
 
 ### Model comparison
 
