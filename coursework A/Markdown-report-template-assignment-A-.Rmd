@@ -679,10 +679,10 @@ In most extensive mathematical model, the score is drawn from a normal distribut
 $\text{Score} \sim N(\mu, \sigma)$
 $\mu = a + a_\text{Subject}[Subject] + b * \text{session}$
 $a_\text{Subject}[Subject] \sim N(0, \sigma_\text{Subject})$
-$\sigma_\text{Subject} \sim \text{Cauchy}(0, 100)T(0, \inf)$
+$\sigma_\text{Subject} \sim \text{Cauchy}(0, 100)T(0, \infty)$
 $a \sim N(0, 100)$
 $b \sim N(0, 5)$
-$\sigma \sim \text{Cauchy}(0,50)T(0, \inf)$
+$\sigma \sim \text{Cauchy}(0,50)T(0, \infty)$
 
 For the prior of the standard deviations $\sigma_\text{Subject}$ and $\sigma$ we use a half Cauchy distribution. We use a Cauchy distribution with a large scale value, since we do not have much prior knowledge or belief about the true parameters. With this large scale, the half Cauchy distribution has, unlike the normal distribution, fat tails. This makes the distribution over values away from the mean more uniform than in a normal distribution. For parameters $a$, $a_\text{Subject}$ and $b$ we chose to use a normal distribution as prior.
 
