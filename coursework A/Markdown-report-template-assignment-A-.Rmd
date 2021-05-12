@@ -309,7 +309,9 @@ In order to determine whether sentiment of tweets depend on the celebrity they a
 #### Model description
 
 <!-- Describe the mathematical model fitted on the most extensive model. (hint, look at the mark down file of the lectures to see example on formulate mathematical models in markdown). Justify the priors. -->
-The most complex model tested uses the celebrity as a independent variable to predict the score. As we can expect the tweet sentiments to be normally distributed around 0 with almost all data between -5 and 5 due to the tweet word limit, a normally distributed prior with $\mu=0$ and $\sigma^2 =2$ is used.
+The most complex model tested uses the celebrity as a independent variable to predict the score. As we can expect the tweet sentiments to be normally distributed around 0 with almost all data between -5 and 5 due to the tweet word limit, a normally distributed prior with $\mu=0$ and $\sigma =2$ is used for $\mu$, and we allow $\sigma$ to take a value between 0.0001 and 5. When adding celebrity as an independent variable predictor, $a$ becomes a vector of parameters for each celebrity, giving us the following model where $N$ and $U$ represent a normal and uniform distribution respectively,
+
+$$\mu_{\text{celebrity}} = N(a_{\text{celebrity}}, \sigma) \\ a \sim N(0, 2) \\ \sigma \sim U(0.0001, 5)$$
 
 ```{r}
 semFrame <- subset(semFrame, select = c(score, CandidateF)) 
@@ -323,7 +325,7 @@ plot(x, y, type="l", lwd=1, main="Normal distribution with a mean of 0 and a sta
 #### Model comparison
 
 <!-- Conduct model analysis and provide brief interpretation of the results -->
-Comparing the null model with the model using celebrity as a independent variable predictor, we can see that the latter model has a lower WAIC and thus a better fit, indicating that using celebrity as a predictor improves the fit of the model.
+As 0 is in none of the confidence intervals for $a_1, a_2,$ and $a_3$, we can conclude that the distribution of tweet sentiments for all three celebrities vary significantly from the prior we have given. Furthermore, comparing the null model with the model using celebrity as a independent variable predictor, we can see that the latter model has a lower WAIC and thus a better fit, indicating that using celebrity as a predictor improves the fit of the model.
 
 ```{r STAN CHUNK}
 #include your code and output in the document
