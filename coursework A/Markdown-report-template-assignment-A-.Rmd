@@ -14,12 +14,9 @@ subtitle: CS4125 Seminar Research Methodology for Data Science
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
 \tableofcontents
 
-
 # Part 1 - Design and set-up of true experiment 
-
 
 ## The motivation for the planned research 
 <!-- (Max 250 words) -->
@@ -30,15 +27,12 @@ The coronavirus pandemic has had a great impact on many aspects of society. Univ
 <!-- I am not really covering how the experiments should be done, this may be important to add? Currently ~210 words.-->
 Figlio et al. (2013) presented, according to them, the first experimental evidence on the effects of live versus online instruction. In this research, participants took an entire microeconomics course either only attending live lectures or online lectures. Exam performance was then compared between both groups and all students which did not volunteer to participate in the experiment but did still follow the course. Result showed that there is a modest difference in exam scores in favour of the students only attending live lectures, although the authors state that the experiments had many limitations and that further research is necessary. In contrary, a more recent survey by Nguyen (2015), which summarizes results of multiple studies, has found that 92% makes online education to be at least as effective, if not better, than live education. However, it is also important to recognize other issues that may arise when switching teaching modalities, which becomes clear when such a shift is forced due to, for example, the onset of COVID-19. In a very recent study by Finnegan (2021), results showed that while results are marginally worse after the shift to online teaching, student experience has deteriorated when their learning environment is suddenly changed, especially with students with poor online access.
 
-
 ## Research questions 
 <!--
 The research question that will be examined in the experiment (or alternatively the hypothesis that will be tested in the experiment)
 -->
 
 Our research question is the following: "How is students' understanding of lecture material affected by attending the lecture live rather than online?". We describe our null hypothesis and alternative hypothesis in the section on suggested statistical analyses.
-
-
 
 ## The related conceptual model 
 This model should include:
@@ -78,11 +72,7 @@ In order to determine the difference between live and online lectures on student
 <!--
 Describe how the experiment will be executed step by step
 -->
-
 First, we ask all students in the class who have agreed to participate in our experiment to perform a pre-test a day before the lecture. The pre-test will consist of questions composed by the teacher giving the lecture. The questions should reflect the main learning goals of the lecture. Ideally, this pre-test is done in a controlled setting on campus. If this is not possible due to governmental restrictions, the pre-test is performed online. All students perform the pre-test at the same time. After the pre-test, students are assigned to either the live lecture condition or the online lecture condition. To reduce unexplained variability, we will opt for a randomized block design. We will divide similar participants into blocks based on their pre-test scores. Then, we randomly assign participants from each block to the live condition or the online condition. Students in both conditions will follow the same lecture at the same time. A day after the lecture, the students perform a post-test. Just like the pre-test, the post-test will consist of questions composed by the teacher giving the lecture and should reflect the main learning goals of the lecture. However, the questions from the pre-test should not be repeated. Again, this post-test is ideally done in a controlled setting on campus, but may have to be performed online. 
-<!--
-Perhaps we could also create groups which do not perform the pre-test to see the influence of this test on the post-test results.
--->
 
 ## Measures
 In the experiment, both participant groups will take a pre-test and a post-test. This test aims to evaluate the participants' comprehension of the lecture material. The pre-test is meant to serve as a baseline measurement to rule out any pre-existing knowledge of the participants. Both tests will be identical and will be in the form of a multiple choice exam of ten questions to be taken in a short time span (10 minutes). The score of the test is defined as the proportion of correct answers. The measure of the experiment is the ratio between these to tests for each particpant: the score of the post-test divided by the score of the pre-test. 
@@ -96,9 +86,7 @@ Participants should be students and could be recruited by asking for volunteers 
 <!-- 
 Describe the statistical test you suggest to care out on the collected data 
 -->
-
 First, we determine our null hypothesis $H_0$ and alternative hypothesis $H_1$. Our null hypothesis states that there is no difference in student understanding of the lecture material between the two different conditions. Our alternative hypothesis states that there is a difference in student understanding. We create two linear models to predict student understanding of lecture material. First, we create a model which has only an intercept. This model does not use the information about which condition a participant was in. This model will be referred to as $m_0$. Second, we create a model which does include this information ass a predictor. This model will be referred to as $m_1$. Then, we compare the fits of the two models to the data. We determine whether $m_1$ fits significantly better than $m_0$ through an ANOVA F-test. If this is not the case, we cannot reject our null hypothesis. We may also inspect the significance of the parameters of $m_1$. If the effect of the condition parameter is not significant, we cannot reject our null hypothesis.
-
 
 # Part 2 - Generalized linear models
 
@@ -112,7 +100,6 @@ First, we determine our null hypothesis $H_0$ and alternative hypothesis $H_1$. 
 <!-- Include the annotated R script (excluding your personal Keys and Access Tokens information), but put echo=FALSE, so code is not included in the output pdf file. -->
 <!-- TODO: Dit willen we misschien dubbel checken voordat we hem inleveren -->
 Note from the author: as this data is updated with each run, analyses may not reflect accompanying graphs in certain sections as they were performed on older data.
-
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, include = FALSE}
 
@@ -170,7 +157,6 @@ clearTweets <- function(tweets, excl) {
   return(corpus_clean)
 } 
 
-
 ## capture all the output to a file.
 
 ################# Collect from Twitter
@@ -185,39 +171,17 @@ source("your_twitter.R") #this file will set my personal variables for my twitte
 
 setup_twitter_oauth(consumer_key,consumer_scret, access_token,access_scret) #connect to  twitter app
 
-
-##### This example uses the following 3 celebrities: Donald Trump, Hillary Clinton, and Bernie Sanders
-##  You should replace this with your own celebrities, at least 3, but more preferred 
 ##  Note that it will take the computer some to collect the tweets
 
-tweets_J <- searchTwitter("#justinbieber", n=300, lang="en", resultType="recent") #300 recent tweets about Donald Trump, in English (I think that 1500 tweets is max)
-tweets_T <- searchTwitter("#taylorswift", n=300, lang="en", resultType="recent") #300 recent tweets about Hillary Clinton
-tweets_B <- searchTwitter("#billieeilish", n=300, lang="en", resultType="recent") #300 recent tweets about Bernie Sanders
-
-
-
-######################## WordCloud
-### This not requires in the assignment, but still fun to do 
-
-# based on https://youtu.be/JoArGkOpeU0
-
-#corpus_T<-clearTweets(tweets_T, c("trump","amp","realdonaldtrump","trumptrain","donald","trumps","alwaystrump")) #remove also some campain slogans
-#wordcloud(corpus_T, max.words=50)
-
-#corpus_C<-clearTweets(tweets_C, c("hillary","amp","clinton","hillarys"))
-#wordcloud(corpus_C,  max.words=50)
-
-#corpus_B<-clearTweets(tweets_B, c("bernie", "amp", "sanders","bernies"))
-#wordcloud(corpus_B,  max.words=50)
-##############################
+tweets_J <- searchTwitter("#justinbieber", n=300, lang="en", resultType="recent") #300 recent tweets about Justin Bieber, in English
+tweets_T <- searchTwitter("#taylorswift", n=300, lang="en", resultType="recent") #300 recent tweets about Taylor Swift, in English
+tweets_B <- searchTwitter("#billieeilish", n=300, lang="en", resultType="recent") #300 recent tweets about Billie Eilish, in English
 
 ######################## Sentiment analysis
 
 tweets_J.text <- laply(tweets_J, function(t)t$getText()) #get text out of tweets 
 tweets_T.text <- laply(tweets_T, function(t)t$getText()) #get text out of tweets
 tweets_B.text <- laply(tweets_B, function(t)t$getText()) #get text out of tweets
-
-
 
 #taken from https://github.com/mjhea0/twitter-sentiment-analysis
 pos <- scan('positive-words.txt', what = 'character', comment.char=';') #read the positive words
@@ -237,18 +201,14 @@ sem<-data.frame(analysis_J$score, analysis_T$score, analysis_B$score)
 
 semFrame <-melt(sem, measured=c(analysis_J.score,analysis_T.score, analysis_B.score ))
 names(semFrame) <- c("Candidate", "score")
-semFrame$Candidate <-factor(semFrame$Candidate, labels=c("Justin Bieber", "Taylor Swift", "Billie Eilish")) # change the labels for your celibrities
-
-#The data you need for the analyses can be found in semFrame
-
+semFrame$Candidate <-factor(semFrame$Candidate, labels=c("Justin Bieber", "Taylor Swift", "Billie Eilish")) 
 ```
 
 ### Homogeneity of variance analysis
 <!-- Analyze the homogeneity of variance of sentiments of the tweets of the different celebrities, and provide interpretation -->
-From the boxplot containing the distribution of tweet sentiments for all three celebrities we can conclude that there is a visible difference in sentiment variance, but performing Levene's test verifies this. In the results of that test we can see that they are significant ($p<0.05$), indicating that there is variance inequality between all three groups of tweets.
+From the boxplot containing the distribution of tweet sentiments for all three celebrities we can conclude that there is a visible difference in sentiment variance. Performing Levene's test verifies this. In the results of that test we can see that the effect is significant ($p<0.05$). This indicates that there is variance inequality between all three groups of tweets.
 
 ```{r, message=FALSE, warning=FALSE, echo = T, results = 'hide'}
-#include your code and output in the document
 
 library(car)
 library(pander)
@@ -260,20 +220,19 @@ boxplot(semFrame$score ~ semFrame$Candidate)
 pander(leveneTest(semFrame$score, semFrame$Candidate, center = median))
 ```
 
-
 ### Visual inspection Mean and distribution sentiments
 <!-- Graphically examine the mean and distribution sentiments of tweets for each celebrity, and provide interpretation -->
-Analysing the bar graph of sentiments counts for all tweets for each celebrity, we can see that in general tweets about Justin Bieber are most neutral, with most tweets having a sentiment of either 0 or 0.5, while tweets about Taylor Swift vary greatly, having sentiment values between -1 and 4. Tweets about Billie Eilish are the most negative and also have the most tweets with value 0.
+Analysing the bar graph of sentiment counts for all tweets for each celebrity, we can see that in general tweets about Justin Bieber are most neutral, with most tweets having a sentiment of either 0 or 0.5, while tweets about Taylor Swift vary greatly, having sentiment values between -1 and 4. Tweets about Billie Eilish are the most negative and also have the most tweets with value 0.
 
 ```{r, message=FALSE, warning=FALSE, echo = T, results = 'hide', cache=TRUE}
-#include your code and output in the document
-
 library(ggplot2)
+
 p <- semFrame %>% ggplot( aes(x=score)) + geom_histogram( color="#e9ecef", alpha=0.6, position = 'identity') + facet_grid(. ~ Candidate)
 ```
 ```{r "Bar plot for the tweet sentiment values for each celebrity."}
 plot(p)
 ```
+
 ### Frequentist approach
 
 #### Linear model
@@ -313,7 +272,7 @@ In order to determine whether sentiment of tweets depend on the celebrity they a
 #### Model description
 
 <!-- Describe the mathematical model fitted on the most extensive model. (hint, look at the mark down file of the lectures to see example on formulate mathematical models in markdown). Justify the priors. -->
-The most complex model tested uses the celebrity as a independent variable to predict the score. As we can expect the tweet sentiments to be normally distributed around 0 with almost all data between -5 and 5 due to the tweet word limit, a normally distributed prior with $\mu=0$ and $\sigma =2$ is used for $\mu$, and we allow $\sigma$ to take a value between 0.0001 and 5. When adding celebrity as an independent variable predictor, $a$ becomes a vector of parameters for each celebrity, giving us the following model where $N$ and $U$ represent a normal and uniform distribution respectively,
+The most complex model tested uses the celebrity as an independent variable to predict the score. As we can expect the tweet sentiments to be normally distributed around 0 with almost all data between -5 and 5 due to the tweet word limit, a normally distributed prior with $\mu=0$ and $\sigma =2$ is used for $\mu$, and we allow $\sigma$ to take a value between 0.0001 and 5. When adding celebrity as an independent variable predictor, $a$ becomes a vector of parameters for each celebrity, giving us the following model where $N$ and $U$ represent a normal and uniform distribution respectively,
 
 $$\mu_{\text{celebrity}} = N(a_{\text{celebrity}}, \sigma) \\ a \sim N(0, 2) \\ \sigma \sim U(0.0001, 5)$$
 
@@ -373,7 +332,7 @@ plot(compare(m0, m1, func=WAIC))
 #### Comparison celebrity pair
 
 <!-- Compare sentiments of celebrity pairs and provide a brief interpretation (e.g. CIs)  -->
-Using the _bayes.t.test_ we can analyse the difference in tweet sentiment distributions for each celebrity pair. From the plots we can deduce that indeed there is a significant ($p < 0.01$) probability that the true distributions of the tweet sentiments for the three celebrities are different from one another.
+Using `_bayes.t.test_` we can analyse the difference in tweet sentiment distributions for each celebrity pair. From the plots we can deduce that indeed there is a significant ($p < 0.01$) probability that the true distributions of the tweet sentiments for the three celebrities are different from one another.
 
 ```{r, message=FALSE, warning=FALSE, echo = T, results = 'hide'}
 # Might have to do 'brew install jags' on Mac to make this work.
@@ -404,7 +363,7 @@ plot(bayes.t.test(tsSub$score, beSub$score))
 
 ### Visual inspection
 <!--Graphically examine the variation in page visits for different factors levels (e.g. histogram, density plot etc.)-->
-The first step in our inspection is to observe the distribution Dependent Variable overall regardless of the factors.
+The first step in our inspection is to observe the distribution of the dependent variable overall regardless of the factors.
 
 ```{r, message=FALSE, warning=FALSE}
 library(ggplot2)
@@ -419,13 +378,16 @@ web_visit$portal <- factor(x=web_visit$portal, labels=c("consumers", "companies"
 p <- web_visit %>% ggplot(aes(x=pages)) + geom_histogram(bins=10)
 plot(p)
 ```
+
 To determine whether either of the IV's have an effect on the distribution of the page visits we observe the distributions under different instantiations of the IV's in the following figure:
 
 ```{r, warning=FALSE, message=FALSE, fig.cap="Histograms of page visits on the website per independent variable."}
 p <- web_visit %>% ggplot( aes(x=pages)) + geom_histogram(bins=10) + facet_grid(portal ~ version)
 plot(p)
 ```
+
 To further assist our understanding of the distribution we will also draw boxplots of the same data to observe differences in the distribution:
+
 ```{r, warning=FALSE, message=FALSE, fig.cap="Boxplots of page visits on the website per independent variable"}
 p <- web_visit %>% ggplot( aes(y=pages)) + geom_boxplot() + facet_grid(portal ~ version, scales = "free_x", space = "free_x") + theme( axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank())
 plot(p)
@@ -436,6 +398,7 @@ Based on the figures it seems that the IV's do affect the distribution of the DV
 <!--Visually inspect if variable page visits deviates from a Gaussian distribution, and discuss implication for general linear model analysis.-->
 
 Again, we take the histogram of the distribution of all data and try to fit a normal distribution to the data. Here, we have taken a normal distribution with as $\mu$ parameter the average of the data and as $\sigma$ the variance of the data. 
+
 ```{r, message=FALSE, warning=FALSE}
 m<-mean(web_visit$pages)
 std<-sqrt(var(web_visit$pages))
@@ -446,6 +409,7 @@ p <- web_visit %>% ggplot( aes(x=pages)) + geom_histogram(aes(y =..density..), b
 
 plot(p)
 ```
+
 The figure shows that the distribution of the data does not fit to a normal distribution. This does not have to be an issue for the general linear model analysis as the assumption over the distribution of the data only applies to the errors. The assumption is that the errors are normally distributed.
 
 ### Frequentist Approach
@@ -453,7 +417,6 @@ The figure shows that the distribution of the data does not fit to a normal dist
 #### Model analysis
 <!--Conduct a model analysis, to examine the added values of adding 2 factors and interaction between the factors in the model to predict page visits, and include brief interpretation of the results.-->
 First we perform Levene's Test to determine the homogeneity of variance. 
-
 
 ```{r}
 library(car)
@@ -480,6 +443,7 @@ pander(anova(model0,model2), caption = "Portal type as main effect on page visit
 pander(anova(model3,model4),caption = "Interation effect on top of two main effects")
 pander(anova(model4),caption = "Effect of Website version, Portal type and interaction effect on page visits")
 ```
+
 The results justify a further investigation into the effects of the factors. However, we will first also evaluate the goodness of fit of the final statistical model through a Akaike Information Criterion (AIC) comparison:
 
 ```{r, warning=FALSE, message=FALSE}
@@ -492,6 +456,7 @@ model.names <-c("model0","model1","model2","model3","model4")
 ```{r}
 pander(aictab(cand.set = models, modnames=model.names))
 ```
+
 The analysis shows that the final model had the best goodness of fit and, in fact, captures all predictive power that could be found in the full set of models. 
 
 #### Simple effect analysis
@@ -504,6 +469,7 @@ bar <- ggplot(web_visit, aes(portal , pages, fill = version))
 bar + stat_summary(fun.y = mean, geom = "bar", position="dodge")
 
 ```
+
 The plot clearly shows that there is a greater difference between the old and new versions of the website for the company portal. The Simple effect analysis will be conducted through a linear model fitted to contrasts on the consumer and company variables.
 
 ```{r, warning=FALSE, message=FALSE}
@@ -528,7 +494,6 @@ The Simple effect analysis demonstrates no significant difference between page v
 #### Report section for a scientific publication
 <!-- Write a small section for a scientific publication, in which you report the results of the analyses, and explain the conclusions that can be drawn. -->
 A linear model was fitted on the amount of page visits for users of a website, taking as independent variables the website version (new or old) and the user portal (consumer or company). The analysis found a significant main effect ($F(1,995)=36.2,\ p.< 0.01$) for the website version as well as for the portal ($F(995,1)=178.8,\ p.<0.01$). Moreover, the analysis found a significant two-way interaction effect ($F(1,995)=46.2,\ p.<0.01$). A Simple Effect analysis was conducted to further examine the two-way interaction between the independent variables. It revealed a significant ($t=9.22,\ p. 0.01$) difference for website version in the company portal of the website but no significant effect ($t=13.4,\ p=0.67$) for the website version in the consumer portal.
-
 
 ### Bayesian Approach
 
@@ -555,7 +520,6 @@ plot(p)
 ```
 
 #### Model comparison
-
 <!-- Conduct model analysis and provide brief interpretation of the results -->
 Besides the previously defined model, we defined simpler models which capture the effects of the factors on their own and their joint as well as interaction effect.  
 
@@ -632,6 +596,7 @@ exp_data = read.csv("set1.csv")
 p <- exp_data %>% ggplot( aes(x=score)) + geom_histogram(bins=15) + theme()
 plot(p)
 ```
+
 We also inspect the relationship between session and score through a scatterplot.
 
 ```{r "Scatterplot relation between score & session"}
@@ -701,7 +666,7 @@ pander(anova(model0, model1), caption = "Model comparison.")
 <!--
 Write a small section for a scientific publication, in which you report the results of the analyses, and explain the conclusions that can be drawn.
 -->
-There was a significant relationship between session and score, $M = 116.8139$ (95% CI 112.70, 120.93), $p = 0$. The relationship between score and session showed significant variance in intercepts across subjects, $SD = 46.51$ (95% CI 43.67, 49.54), $p = 0$. 
+To investigate whether session has an impact on people's scores and wheter there is a significant variance between the participants in their score, multilevel analysis was performed. A model with a random intercept only and a model with a random intercept and fixed effects were created. There was a significant relationship between session and score, $M = 116.8139$ (95% CI 112.70, 120.93), $p = 0$. The relationship between score and session showed significant variance in intercepts across subjects, $SD = 46.51$ (95% CI 43.67, 49.54), $p = 0$. 
 
 ## Bayesian approach
 
