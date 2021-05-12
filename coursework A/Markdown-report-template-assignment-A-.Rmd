@@ -21,7 +21,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ## The motivation for the planned research 
-(Max 250 words)
+<!-- (Max 250 words) -->
 The coronavirus pandemic has had a great impact on many aspects of society. University education, in particular, has changed significantly. As education in many countries has shifted from physical lectures to online teleconferencing lectures, concerns have been raised with regards to the effectiveness of this method of education. While the technological developments surrounding teleconferencing have enabled an almost seamless transition from offline to online education, it may be that the lack of a physically present lecturer affects the comprehensibility of the lecture material for students. With this research, we aim to address whether the students' understanding of the lecture material is affected by a different learning setting (i.e., from home watching an online lecture). The results may reveal whether online education is a way to move forward out of the pandemic. Moreover, if the results indicate no significant change in student understanding of material it may open up the way for new form of education, where students could enroll into "digital universities" without needing to be present at any time.
 
 ## The theory underlying the research  
@@ -108,10 +108,12 @@ First, we determine our null hypothesis $H_0$ and alternative hypothesis $H_1$. 
 
 ### Conceptual model
 <!-- Make a conceptual model for the following research question: Is there a difference in the sentiment of the tweets related to the different celebrities? -->
-![The conceptual model. Different attributes of a celebrity are shown which may influence the sentiment of tweets related to a certain celebrity.](2.1.png)
+![The conceptual model. Different attributes of a celebrity are shown which may influence the sentiment of tweets related to a certain celebrity.](ConceptualModel2.1.pdf)
 
 ### Collecting tweets, and data preparation
-Include the annotated R script (excluding your personal Keys and Access Tokens information), but put echo=FALSE, so code is not included in the output pdf file.
+<!-- Include the annotated R script (excluding your personal Keys and Access Tokens information), but put echo=FALSE, so code is not included in the output pdf file. -->
+<!-- TODO: Dit willen we misschien dubbel checken voordat we hem inleveren -->
+Note from the author: as this data is updated with each run, analyses may not reflect accompanying graphs in certain sections as they were performed on older data.
 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, include = FALSE}
@@ -244,21 +246,24 @@ semFrame$Candidate <-factor(semFrame$Candidate, labels=c("Justin Bieber", "Taylo
 ```
 
 ### Homogeneity of variance analysis
-Analyze the homogeneity of variance of sentiments of the tweets of the different celebrities, and provide interpretation
+<!-- Analyze the homogeneity of variance of sentiments of the tweets of the different celebrities, and provide interpretation -->
+From the boxplot containing the distribution of tweet sentiments for all three celebrities we can conclude that there is a visible difference in sentiment variance, but performing Levene's test verifies this. In the results of that test we can see that they are significant ($p<0.05$), indicating that there is variance inequality between all three groups of tweets.
 
 ```{r}
 #include your code and output in the document
 
 library(car)
+library(pander)
 
 boxplot(semFrame$score ~ semFrame$Candidate)
-leveneTest(semFrame$score, semFrame$Candidate, center = median)
+pander(leveneTest(semFrame$score, semFrame$Candidate, center = median), caption = "Results of performing Levene's test on the three groups of tweets about the three celebrities.")
 
 ```
 
 
 ### Visual inspection Mean and distribution sentiments
-Graphically examine the mean and distribution sentiments of tweets for each celebrity, and provide interpretation
+<!-- Graphically examine the mean and distribution sentiments of tweets for each celebrity, and provide interpretation -->
+Analysing the bar graph of sentiments counts for all tweets for each celebrity, we can see that in general tweets about Justin Bieber are most neutral, with most tweets having a sentiment of either 0 or 0.5, while tweets about Taylor Swift vary greatly, having sentiment values between -1 and 4. Tweets about Billie Eilish are the most negative and also have the most tweets with value 0.
 
 ```{r}
 #include your code and output in the document
@@ -271,7 +276,8 @@ plot(p)
 ### Frequentist approach
 
 #### Linear model
-Use a linear model to analyze whether the knowledge to which celebrity a tweet relates has a significant impact on explaining the sentiments of the tweets. Provide interpretation of results 
+<!-- Use a linear model to analyze whether the knowledge to which celebrity a tweet relates has a significant impact on explaining the sentiments of the tweets. Provide interpretation of results  -->
+The results of performing an F-test on a null model and a model where the celebrity is added as a independent variable show that there is a significant improvement with the latter model with respect to the quality of the fit. This means that knowing the celebrity gives information about the distribution of tweet sentiments in the data set.
 
 ```{r}
 #include your code and output in the document
@@ -279,51 +285,59 @@ library(pander)
 library(multcomp)
 
 semFrame$CandidateF <-factor(semFrame$Candidate, levels =c("Justin Bieber", "Taylor Swift", "Billie Eilish"), labels =c("Justin Bieber", "Taylor Swift", "Billie Eilish"))
-#model0 <-lm(score~1, data = semFrame, na.action = na.exclude)
-#model1 <-lm(score~CandidateF, data = semFrame, na.action = na.exclude)
 
-res.aov <- aov(score ~ Candidate, data=semFrame)
+res.aov <- aov(score ~ Candidate, data=semFrame, na.action=na.exclude)
 
-pander(summary(res.aov))
+pander(res.aov, "Effect pre-post measuring condition on the tweet sentiments of the three celebrities.")
 ```
 
 #### Post Hoc analysis
-If a model that includes the celebrity is better in explaining the sentiments of tweets than a model without such predictor, conduct a post-hoc analysis with e.g. Bonferroni correction, to examine which of celebrity tweets differ from the other celebrity tweets. Provide interpretation of the results
+<!-- If a model that includes the celebrity is better in explaining the sentiments of tweets than a model without such predictor, conduct a post-hoc analysis with e.g. Bonferroni correction, to examine which of celebrity tweets differ from the other celebrity tweets. Provide interpretation of the results -->
+Performing Post Hoc analysis allows us to determine whether there is a significant difference in tweet sentiments between all three celebrities, and how the distribution changes between them. The results, obtained by performing Tukey's Honest Significant Difference test, show that there is a significant difference in tweet sentiments for all three celebrities. Tweets about Taylor Swifts are the most positive, while those about Billie Eilish's are most negative, confirming our findings in the visual inspection.
 
 ```{r}
-
-pander(TukeyHSD(res.aov))
-#include your code and output in the document
-#pairwise.t.test(semFrame$score, semFrame$Candidate, paired = FALSE, p.adjust.method = "bonferroni")
-
+library(stats)
+TukeyHSD(res.aov)
 ```
 
 #### Report section for a scientific publication
-Write a small section for a scientific publication, in which you report the results of the analyses, and explain the conclusions that can be drawn.
+<!-- Write a small section for a scientific publication, in which you report the results of the analyses, and explain the conclusions that can be drawn. -->
+In order to determine whether sentiment of tweets depend on the celebrity they are about, a null model and a model with celebrity added as a independent variable predictor have been constructed. Results showed that the fit was significantly better ($F(2, 897) = 44.39$, p. < 0.01) with the added predictor. We can therefore conclude that the Twitter user base tweets about differently about the three celebrities in the data set. Further analysis using Post Hoc analysis using Tukey's Honest Significant Difference test showed that there is a significant difference in tweet sentiment distribution in all three celebrity pairs, Taylor Swift - Justin Bieber (p. < 0.01), and Billie Eilish - Justin Bieber (p. < 0.01), and Taylor Swift - Billie Eilish (p. < 0.01).
 
 ### Bayesian Approach
 
 #### Model description
 
-Describe the mathematical model fitted on the most extensive model. (hint, look at the mark down file of the lectures to see example on formulate mathematical models in markdown). Justify the priors.
+<!-- Describe the mathematical model fitted on the most extensive model. (hint, look at the mark down file of the lectures to see example on formulate mathematical models in markdown). Justify the priors. -->
+The most complex model tested uses the celebrity as a independent variable to predict the score. As we can expect the tweet sentiments to be normally distributed around 0 with almost all data between -5 and 5 due to the tweet word limit, a normally distributed prior with $\mu=0$ and $\sigma =2$ is used for $\mu$, and we allow $\sigma$ to take a value between 0.0001 and 5. When adding celebrity as an independent variable predictor, $a$ becomes a vector of parameters for each celebrity, giving us the following model where $N$ and $U$ represent a normal and uniform distribution respectively,
+
+$$\mu_{\text{celebrity}} = N(a_{\text{celebrity}}, \sigma) \\ a \sim N(0, 2) \\ \sigma \sim U(0.0001, 5)$$
+
+```{r}
+semFrame <- subset(semFrame, select = c(score, CandidateF)) 
+
+hist(semFrame$score, main="Sentiment values of all tweets.")
+x <- seq(-5, 5, length=100)
+y <- dnorm(x, mean=0, sd=2)
+plot(x, y, type="l", lwd=1, main="Normal distribution with a mean of 0 and a standard deviation of 2.")
+```
 
 #### Model comparison
 
-Conduct model analysis and provide brief interpretation of the results
+<!-- Conduct model analysis and provide brief interpretation of the results -->
+As 0 is in none of the confidence intervals for $a_1, a_2,$ and $a_3$, we can conclude that the distribution of tweet sentiments for all three celebrities vary significantly from the prior we have given. Furthermore, comparing the null model with the model using celebrity as a independent variable predictor, we can see that the latter model has a lower WAIC and thus a better fit, indicating that using celebrity as a predictor improves the fit of the model.
 
 ```{r STAN CHUNK}
 #include your code and output in the document
 library("rstan")
 library("rethinking")
 
-semFrame <- subset(semFrame, select = c(score, CandidateF)) 
-
 m0 <-ulam(
   alist(
     score ~ dnorm(mu, sigma), 
     mu <- a,
-    a ~ dnorm(0, 3),
-    sigma ~ dunif(0.0001, 10)),  
+    a ~ dnorm(0, 2),
+    sigma ~ dunif(0.0001, 5)),  
   data =  semFrame ,iter = 10000, chains = 4, cores = 4, control=list(adapt_delta=.99), log_lik=TRUE
 )
 
@@ -331,18 +345,32 @@ m1 <-ulam(
  alist(
    score ~ dnorm(mu, sigma),
    mu <- a[CandidateF] ,
-   sigma ~  dunif(0.0001, 10),
-   a[CandidateF] ~ dnorm(0, 10)),
+   sigma ~  dunif(0.0001, 5),
+   a[CandidateF] ~ dnorm(0, 2)),
  data =  semFrame ,iter = 10000, chains = 4, cores = 4, control=list(adapt_delta=.99), log_lik=TRUE
 )
 
-precis(m1, depth=2, prob = .95)
-compare(m0, m1, func=WAIC)
+pander(precis(m1, depth=2, prob = .95))
+plot(compare(m0, m1, func=WAIC))
 ```
 
 #### Comparison celebrity pair
 
-Compare sentiments of celebrity pairs and provide a brief interpretation (e.g. CIs) 
+<!-- Compare sentiments of celebrity pairs and provide a brief interpretation (e.g. CIs)  -->
+Using the _bayes.t.test_ we can analyse the difference in tweet sentiment distributions for each celebrity pair. From the plots we can deduce that indeed there is a significant ($p < 0.01$) probability that the true distributions of the tweet sentiments for the three celebrities are different from one another.
+
+```{r}
+# Might have to do 'brew install jags' on Mac to make this work.
+library(rjags)
+devtools::install_github("rasmusab/bayesian_first_aid")
+library(BayesianFirstAid)
+jbSub <- subset(semFrame, (CandidateF == "Justin Bieber"))
+tsSub <- subset(semFrame, (CandidateF == "Taylor Swift"))
+beSub <- subset(semFrame, (CandidateF == "Billie Eilish"))
+plot(bayes.t.test(jbSub$score, tsSub$score))
+plot(bayes.t.test(jbSub$score, beSub$score))
+plot(bayes.t.test(tsSub$score, beSub$score))
+```
 
 
 ## Question 2 - Website visits (between groups - Two factors)
@@ -353,47 +381,44 @@ Compare sentiments of celebrity pairs and provide a brief interpretation (e.g. C
 ### Visual inspection
 <!--Graphically examine the variation in page visits for different factors levels (e.g. histogram, density plot etc.)-->
 The first step in our inspection is to observe the distribution Dependent Variable overall regardless of the factors.
-```{r}
-#include your code and output in the document
-# facet_grid(boxplot(web_visit$pages ~ web_visit$portal + web_visit$version))
+
+```{r, message=FALSE, warning=FALSE}
 library(ggplot2)
-library(magrittr) # needs to be run every time you start R and want to use %>%
-library(dplyr)    # alternatively, this also loads %>%
+library(magrittr)
+library(dplyr)     
 web_visit <- read.csv("webvisit0.csv")
 web_visit$version <- factor(x=web_visit$version, labels=c("old", "new"))
 web_visit$portal <- factor(x=web_visit$portal, labels=c("consumers", "companies"))
 ```
 
-```{r fig.asp = 1.4, fig.width = 3}
-p <- web_visit %>% ggplot(aes(x=pages)) + geom_histogram(bins=10) + labs(title="Histogram of website page visits over all data")
-
+```{r, warning=FALSE, message=FALSE, fig.cap="Histogram showing page visits on the website over all factors."}
+p <- web_visit %>% ggplot(aes(x=pages)) + geom_histogram(bins=10)
 plot(p)
 ```
 To determine whether either of the IV's have an effect on the distribution of the page visits we observe the distributions under different instantiations of the IV's in the following figure:
-```{r}
-p <- web_visit %>% ggplot( aes(x=pages)) + geom_histogram(bins=10) + facet_grid(portal ~ version) + labs(title="Histograms of website visit data per factor of IV's")
 
+```{r, warning=FALSE, message=FALSE, fig.cap="Histograms of page visits on the website per independent variable."}
+p <- web_visit %>% ggplot( aes(x=pages)) + geom_histogram(bins=10) + facet_grid(portal ~ version)
 plot(p)
 ```
 To further assist our understanding of the distribution we will also draw boxplots of the same data to observe differences in the distribution:
-```{r}
-p <- web_visit %>% ggplot( aes(y=pages)) + geom_boxplot() + facet_grid(portal ~ version, scales = "free_x", space = "free_x") + theme( axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank()) + labs(title="Boxplots of website page visits per factor of IV's")
-
+```{r, warning=FALSE, message=FALSE, fig.cap="Boxplots of page visits on the website per independent variable"}
+p <- web_visit %>% ggplot( aes(y=pages)) + geom_boxplot() + facet_grid(portal ~ version, scales = "free_x", space = "free_x") + theme( axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank())
 plot(p)
 ```
 Based on the figures it seems that the IV's do affect the distribution of the DV. While the distributions between the old and new website for consumers does not show a very clearly different distributions, in the other cases there seems to be a significant difference. In particular, the distributions over the old and new website for companies shows a clearly different distribution in the histograms as well as in the boxplots. 
-
 
 ### Normality check
 <!--Visually inspect if variable page visits deviates from a Gaussian distribution, and discuss implication for general linear model analysis.-->
 
 Again, we take the histogram of the distribution of all data and try to fit a normal distribution to the data. Here, we have taken a normal distribution with as $\mu$ parameter the average of the data and as $\sigma$ the variance of the data. 
-```{r fig.asp = 1, fig.width = 6}
-#include your code and output in the document
+```{r, message=FALSE, warning=FALSE}
 m<-mean(web_visit$pages)
 std<-sqrt(var(web_visit$pages))
+```
 
-p <- web_visit %>% ggplot( aes(x=pages)) + geom_histogram(aes(y =..density..), bins=15) + stat_function(fun = dnorm, args = list(mean = mean(web_visit$pages), sd = sd(web_visit$pages))) + labs(title="Normal distribution fitted to data of page visits")
+```{r, message=FALSE, warning=FALSE, fig.cap="Normal distribution fitted to data of page visits"}
+p <- web_visit %>% ggplot( aes(x=pages)) + geom_histogram(aes(y =..density..), bins=15) + stat_function(fun = dnorm, args = list(mean = mean(web_visit$pages), sd = sd(web_visit$pages)))
 
 plot(p)
 ```
@@ -405,27 +430,27 @@ The figure shows that the distribution of the data does not fit to a normal dist
 <!--Conduct a model analysis, to examine the added values of adding 2 factors and interaction between the factors in the model to predict page visits, and include brief interpretation of the results.-->
 First we perform Levene's Test to determine the homogeneity of variance. 
 
+
 ```{r}
-#include your code and output in the document
 library(car)
 library(pander)
 
-leveneTest(web_visit$pages, interaction(web_visit$version , web_visit$portal))
-
+pander(leveneTest(web_visit$pages, interaction(web_visit$version , web_visit$portal)))
 ```
 The p-value of Levene's Test in this case is larger than 0.05 and this thus indicates that the variance are homogeneous. Our assumptions on the data which allows for linear model fitting still hold.
 
 The following tables show the results of fittings linear models and comparing them using ANOVA.
 
 The first table shows whether adding the website version as a predictor for the page visits has a significant effect. The results show indeed that there is a significant effect. The second table indicates the same, but in this case for the portal of the website (i.e. market), this effect is also significant. The third table indicates whether there is an interaction effect between the two factors, which is also significantly demonstrated. The final table shows the combined effect of the two factors as well as the interaction.
-```{r}
 
+```{r, warning=FALSE, message=FALSE}
 model0 <- lm(pages ~ 1 , data = web_visit, na.action = na.exclude)
 model1 <- lm(pages ~ version , data = web_visit, na.action = na.exclude)
 model2 <- lm(pages ~ portal , data = web_visit, na.action = na.exclude)
 model3 <- lm(pages ~ version + portal , data = web_visit, na.action = na.exclude)
 model4 <- lm(pages ~ version + portal + version:portal , data = web_visit, na.action = na.exclude)
-
+```
+```{r}
 pander(anova(model0,model1), caption = "Website version as main effect on page visits")
 pander(anova(model0,model2), caption = "Portal type as main effect on page visits")
 pander(anova(model3,model4),caption = "Interation effect on top of two main effects")
@@ -433,11 +458,15 @@ pander(anova(model4),caption = "Effect of Website version, Portal type and inter
 ```
 The results justify a further investigation into the effects of the factors. However, we will first also evaluate the goodness of fit of the final statistical model through a Akaike Information Criterion (AIC) comparison:
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 library(AICcmodavg)
 models <-list(model0, model1, model2, model3, model4)
 model.names <-c("model0","model1","model2","model3","model4")
-aictab(cand.set = models, modnames=model.names)
+```
+
+
+```{r}
+pander(aictab(cand.set = models, modnames=model.names))
 ```
 The analysis shows that the final model had the best goodness of fit and, in fact, captures all predictive power that could be found in the full set of models. 
 
@@ -445,24 +474,37 @@ The analysis shows that the final model had the best goodness of fit and, in fac
 <!--If the analysis shows a significant two-way interaction effect, conduct a Simple Effect analysis to explore this interaction effect in more detail.It helps first to look at the means of different conditions in a figure. Provide brief interpretation of the results.-->
 As we have previously found a two-way interaction effect between the version and portal factors of the experiment, we will conduct a Simple Effect analysis to explore this interaction effect. 
 
-```{r}
-#include your code and output in the document
+The following bar plot shows how the page visits vary over the factors.
+```{r, warning=FALSE, message=FALSE, fig.cap="Bar plot showing the mean page visits per independent variable."}
+bar <- ggplot(web_visit, aes(portal , pages, fill = version))
+bar + stat_summary(fun.y = mean, geom = "bar", position="dodge")
+
+```
+The plot clearly shows that there is a greater difference between the old and new versions of the website for the company portal. The Simple effect analysis will be conducted through a linear model fitted to contrasts on the consumer and company variables.
+
+```{r, warning=FALSE, message=FALSE}
 web_visit$simple <- interaction(web_visit$version, web_visit$portal) #merge two factors levels(Lec7g$simple) #to see the level in the new factor
 levels(web_visit$simple)
 
-contrastConsumers <-c(1,-1,0,0) #Only the Simple text function data 
-contrastCompanies <-c(0,0,1,-1) #Only the Complex text function data
+contrastConsumers <-c(1,-1,0,0) #Only the consumer portal data 
+contrastCompanies <-c(0,0,1,-1) #Only the company portal data
 
 
 SimpleEff <- cbind(contrastConsumers,contrastCompanies)
-contrasts(web_visit$simple) <- SimpleEff #now we link the two contrasts with the factor simple
+contrasts(web_visit$simple) <- SimpleEff 
+```
+
+```{r, warning=FALSE, message=FALSE}
 simpleEffectModel <-lm(pages ~ simple , data = web_visit, na.action = na.exclude) 
 pander(summary.lm(simpleEffectModel))
 ```
 
+The Simple effect analysis demonstrates no significant difference between page visits for users in the consumer portal using new and old versions of the website. However, it demonstrates that there is a significant difference for users in the company portal.
 
 #### Report section for a scientific publication
 <!-- Write a small section for a scientific publication, in which you report the results of the analyses, and explain the conclusions that can be drawn. -->
+A linear model was fitted on the amount of page visits for users of a website, taking as independent variables the website version (new or old) and the user portal (consumer or company). The analysis found a significant main effect ($F(1,995)=36.2,\ p.< 0.01$) for the website version as well as for the portal ($F(995,1)=178.8,\ p.<0.01$). Moreover, the analysis found a significant two-way interaction effect ($F(1,995)=46.2,\ p.<0.01$). A Simple Effect analysis was conducted to further examine the two-way interaction between the independent variables. It revealed a significant ($t=9.22,\ p. 0.01$) difference for website version in the company portal of the website but no significant effect ($t=13.4,\ p=0.67$) for the website version in the consumer portal.
+
 
 ### Bayesian Approach
 
@@ -471,32 +513,23 @@ pander(summary.lm(simpleEffectModel))
 
 Our most extensive Bayesian model captures each individual factor as well as the interaction of the factors and is defined as follows:
 
-$\text{PageVisits} \sim N(\mu, \sigma)$
-$\mu = a + b \cdot \text{Version} + c \cdot \text{Portal} + d\cdot \text{Version} \cdot \text{Portal}$
-$a \sim N(4, 2)$
-$b \sim N(0, 1)$
-$c \sim N(0, 1)$
-$d \sim N(0, 1)$
-$\sigma \sim U(0.1, 2)$
+$$\text{PageVisits} \sim N(\mu, \sigma) \\ \mu = a + b \cdot \text{Version} + c \cdot \text{Portal} + d\cdot \text{Version} \cdot \text{Portal} \\ a \sim \text{Gamma}(1, 2) \\b \sim N(0, 1) \\ c \sim N(0, 1) \\ d \sim N(0, 1) \\ \sigma \sim U(0.1, 2)$$
 
-Here the functions $N$ and $U$ denote the probability functions of the Normal and Uniform distribution respectively. 
+Here the functions $\text{Gamma}$, $N$ and $U$ denote the probability functions of the Gamma, Normal and Uniform distributions respectively. 
 
-<!-- m4 <-map2stan( alist( -->
-<!--   pages ~ dnorm(mu, sigma), -->
-<!--   mu <- a + b*versionN + c*portalN + d*versionN*portalN,  -->
-<!--   a ~ dnorm(4, 2), -->
-<!--   c(b,c,d) ~ dnorm(0, 1), -->
-<!--   sigma ~ dunif(0.1, 2)),   -->
-<!--   data = web_visit,iter = 10000, chains = 4, cores = 4 -->
-<!-- ) -->
+The Gamma distribution was chosen as a prior as previous plots of the page visits shows the distribution to follow a Gamma distribution. By means of visual inspection the parameters shape $k=1$ and scale $\theta=2$ were chosen. See the figure below for a fit of the distribution to the data with these parameters.
+
+```{r, warning=FALSE, message=FALSE, fig.cap="Gamma distribution (1, 2) fitted to data of page visits"}
+p <- web_visit %>% ggplot( aes(x=pages)) + geom_histogram(aes(y =..density..), bins=15) + stat_function(fun = dgamma, args = list(shape = 1, scale=2))
+plot(p)
+```
 
 #### Model comparison
 
 <!-- Conduct model analysis and provide brief interpretation of the results -->
 Besides the previously defined model, we defined simpler models which capture the effects of the factors on their own and their joint as well as interaction effect.  
 
-```{r}
-#include your code and output in the document
+```{r, warning=FALSE, message=FALSE}
 web_visit <- subset(web_visit, select = c(pages,version, portal )) 
 web_visit$versionN <- as.numeric(web_visit$version)
 web_visit$portalN <- as.numeric(web_visit$portal)
@@ -504,7 +537,7 @@ web_visit$portalN <- as.numeric(web_visit$portal)
 
 m0 <-map2stan( alist(
     pages ~ dnorm(mu, sigma), mu <- a ,
-    a ~ dnorm(4, 2),
+    a ~ dgamma(shape=1, scale=2),
     sigma ~ dunif(0.1, 2)
   ),  data = web_visit,iter = 10000, chains = 4, cores = 4
 )
@@ -512,7 +545,7 @@ m0 <-map2stan( alist(
 
 m1 <-map2stan( alist(
   pages ~ dnorm(mu, sigma), mu <- a + b*versionN,
-  a ~ dnorm(4, 2),
+    a ~ dgamma(shape=1, scale=2),
   b ~ dnorm(0, 1),
   sigma ~ dunif(0.1, 2) ), data = web_visit,iter = 10000, chains = 4, cores = 4
 )
@@ -520,7 +553,7 @@ m1 <-map2stan( alist(
   
 m2 <-map2stan( alist(
   pages ~ dnorm(mu, sigma), mu <- a + c*portalN ,
-  a ~ dnorm(4, 2),
+    a ~ dgamma(shape=1, scale=2),
   c ~ dnorm(0, 1),
   sigma ~ dunif(0.1, 2)), 
   data = web_visit,iter = 10000, chains = 4, cores = 4
@@ -528,7 +561,7 @@ m2 <-map2stan( alist(
 
 m3 <-map2stan( alist(
   pages ~ dnorm(mu, sigma), mu <- a + b*versionN + c*portalN ,
-  a ~ dnorm(4, 2),
+    a ~ dgamma(shape=1, scale=2),
   b ~ dnorm(0, 1),
   c ~ dnorm(0, 1), sigma ~ dunif(0.1, 2)),  
   data = web_visit,iter = 10000, chains = 4, cores = 4
@@ -537,22 +570,26 @@ m3 <-map2stan( alist(
 m4 <-map2stan( alist(
   pages ~ dnorm(mu, sigma),
   mu <- a + b*versionN + c*portalN + d*versionN*portalN, 
-  a ~ dnorm(4, 2),
+    a ~ dgamma(shape=1, scale=2),
   c(b,c,d) ~ dnorm(0, 1),
   sigma ~ dunif(0.1, 2)),  
   data = web_visit,iter = 10000, chains = 4, cores = 4
 )
-
-pander(compare(m0,m1,m2,m3,m4))
-pander(precis(m4, prob= .95))
-
 ```
 
-```{r}
+The figure below demonstrates the differences in WAIC between varying models. Here, `m0` is a model with just the prior, `m1` is a model capturing the effect of the website version, `m2` captures the effect of the portal, `m3` captures the effects of both the version and the portal and `m4` represents the model described earlier.
+
+```{r, warning=FALSE, message=FALSE, fig.cap="WAIC comparison between Bayesian models capturing effects of different variables."}
+plot(compare(m0,m1,m2,m3,m4, func=WAIC))
+```
+
+
+```{r, warning=FALSE, message=FALSE}
 pander(compare(m0,m1,m2,m3,m4))
 pander(precis(m4, prob= .95))
-```
-The WAIC analysis above indicates that the extensive model described at the beginning of the section has the best goodness of fit according to the WAIC comparison. The table below the WAIC comparisons shows the 95% credible intervals for all the model parameters. 
+``` 
+
+The WAIC analysis above indicates that the extensive model described at the beginning of the section has the best goodness of fit according to the WAIC score. The table below the WAIC comparisons shows the 95% credible intervals for all the model parameters. As the null is not present in any of the variables' 95% credible intervals, we deem the results significant.
 
 # Part 3 - Multilevel model
 
