@@ -51,6 +51,26 @@ ggplot(d, aes(x=trdcount, y=score)) + geom_boxplot(outlier.shape = NA) + geom_ji
 
 *How much does transfer learning improve over typical non-transfer learning?*
 
+First we evaluate if there is a difference between the means of the baseline model scores and the non-baseline (transfer learning) model scores.
+```{r paired t test}
+d$modeltype <-factor(d$modeltype == "B",labels=c("Transfer Learning","Baseline"))
+pander(t.test(score ~ modeltype, data = d))
+```
+
+To evaluate whether the test dataset is of influence on whether transfer learning improves we set up a linear mixed effects model.
+
+```{r multi-level}
+model0 <- lme(score ~ 1 , random = ~1|TeD, data = d, method="ML")
+model1 <- lme(score ~ modeltype , random = ~1|TeD, data = d, method="ML")
+summary(model0)
+intervals(model0, 0.95)
+summary(model1)
+intervals(model1, 0.95)
+pander(anova(model0, model1), caption = "Model comparison.")
+
+```
+
+
 ## Researh question 2
 
 *What is the effect of the TrD’s on the final model performance?*
