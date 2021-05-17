@@ -1,0 +1,60 @@
+---
+title: "Analysis"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## To Transfer Learn or Not To Transfer Learn?
+
+```{r libraries}
+library(pander)
+library(dplyr)
+library(nlme)
+```
+
+
+```{r data reading}
+d <- read.csv("data.csv")
+d["TeD"] <- lapply(d["TeD"] , factor)
+
+d
+```
+Null hypothesis: means do not difference between non transfer learning baselines 
+```{r t test}
+d$modeltype <- substring(d$model, 1, 1)
+d$modeltype <-factor(d$modeltype == "B",labels=c("Transfer Learning","Baseline"))
+pander(t.test(score ~ modeltype, data = d))
+
+```
+
+```{r anova}
+aov(data=d, score ~ TeD)
+```
+
+???
+
+
+
+```{r multi-level}
+model0 <- lme(score ~ 1 , random = ~1|TeD, data = d, method="ML")
+model1 <- lme(score ~ modeltype , random = ~1|TeD, data = d, method="ML")
+summary(model0)
+intervals(model0, 0.95)
+summary(model1)
+intervals(model1, 0.95)
+pander(anova(model0, model1), caption = "Model comparison.")
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
