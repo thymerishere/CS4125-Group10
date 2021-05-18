@@ -47,19 +47,28 @@ ggplot(d, aes(x=trdcount, y=score)) + geom_boxplot(outlier.shape = NA) + geom_ji
 
 # Conceptual model
 
+...
+
+# Statistical tests
+
 ## Research question 1
 
 *How much does transfer learning improve over typical non-transfer learning?*
 
 First we evaluate if there is a difference between the means of the baseline model scores and the non-baseline (transfer learning) model scores.
-```{r paired t test}
+
+```{r}
+library(pander)
+
 d$modeltype <-factor(d$modeltype == "B",labels=c("Transfer Learning","Baseline"))
 pander(t.test(score ~ modeltype, data = d))
 ```
 
 To evaluate whether the test dataset is of influence on whether transfer learning improves we set up a linear mixed effects model.
 
-```{r multi-level}
+```{r}
+library(nlme)
+
 model0 <- lme(score ~ 1 , random = ~1|TeD, data = d, method="ML")
 model1 <- lme(score ~ modeltype , random = ~1|TeD, data = d, method="ML")
 summary(model0)
@@ -75,8 +84,39 @@ pander(anova(model0, model1), caption = "Model comparison.")
 
 *What is the effect of the TrD’s on the final model performance?*
 
-# Tests to perform
+```{r}
+model0 <- lme(score ~ 1, random = ~1|TeD, data = d, method="ML")
+model1 <- lme(score ~ TrD1 + TrD2 + TrD3 + TrD4 + TrD5 + TrD6 + TrD8, random = ~1|TeD, data = d, method="ML")
+```
 
 ```{r}
+summary(model0)
+```
 
+```{r}
+intervals(model0, 0.95)
+```
+
+```{r}
+library(jtools)
+
+layout(matrix(c(1,2,3,4),2,2))
+plot(model0)
+```
+
+```{r}
+summary(model1)
+```
+
+```{r}
+intervals(model1, 0.95)
+```
+
+```{r}
+pander(anova(model0, model1), caption = "Model comparison between model 0 and model 1"
+)
+```
+
+```{r}
+plot(model1)
 ```
