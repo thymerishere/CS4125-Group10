@@ -321,12 +321,23 @@ plot(bayes.t.test(jbSub$score, beSub$score))
 plot(bayes.t.test(tsSub$score, beSub$score))
 ```
 
+***
+
 ## Question 2 - Website visits (between groups - Two factors)
 
-### Conceptual model
-![Conceptual Model underlying this research question](ConceptualModel_2.2.png)
+***
 
-### Visual inspection
+### Conceptual model
+
+<!--![Conceptual Model underlying this research question](ConceptualModel_2.2.png)-->
+
+```{r, fig.cap="Conceptual Model underlying this research question", out.width='70%'}
+knitr::include_graphics("ConceptualModel_2.2.png")
+```
+
+***
+
+### Visual inspection - 1
 
 ```{r, include=FALSE}
 library(ggplot2)
@@ -342,15 +353,25 @@ p <- web_visit %>% ggplot(aes(x=pages)) + geom_histogram(bins=10)
 plot(p)
 ```
 
+***
+
+### Visual inspection - 2
+
 ```{r, fig.cap="Histograms of page visits on the website per independent variable."}
 p <- web_visit %>% ggplot( aes(x=pages)) + geom_histogram(bins=10) + facet_grid(portal ~ version)
 plot(p)
 ```
 
+***
+
+### Visual inspection - 3
+
 ```{r, fig.cap="Boxplots of page visits on the website per independent variable."}
 p <- web_visit %>% ggplot( aes(y=pages)) + geom_boxplot() + facet_grid(portal ~ version, scales = "free_x", space = "free_x") + theme( axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank())
 plot(p)
 ```
+
+***
 
 ### Normality check
 
@@ -365,9 +386,13 @@ p <- web_visit %>% ggplot( aes(x=pages)) + geom_histogram(aes(y =..density..), b
 plot(p)
 ```
 
+***
+
 ### Frequentist Approach
 
-#### Model analysis
+#### Model analysis - Levene's Test
+
+Levene's Test to analyze the homogeniety of variance when adding the factors and the interaction between the factors.
 
 ```{r}
 library(car)
@@ -375,6 +400,10 @@ library(pander)
 
 pander(leveneTest(web_visit$pages, interaction(web_visit$version , web_visit$portal)))
 ```
+
+***
+
+#### Model Analysis Results - 1
 
 ```{r, include=FALSE}
 model0 <- lm(pages ~ 1 , data = web_visit, na.action = na.exclude)
@@ -384,12 +413,38 @@ model3 <- lm(pages ~ version + portal , data = web_visit, na.action = na.exclude
 model4 <- lm(pages ~ version + portal + version:portal , data = web_visit, na.action = na.exclude)
 ```
 
+
 ```{r}
 pander(anova(model0,model1), caption = "Website version as main effect on page visits")
+```
+
+***
+
+#### Model Analysis Results - 2
+
+```{r}
 pander(anova(model0,model2), caption = "Portal type as main effect on page visits")
+```
+
+***
+
+#### Model Analysis Results - 3
+
+```{r}
 pander(anova(model3,model4),caption = "Interation effect on top of two main effects")
+```
+
+***
+
+#### Model Analysis Results - 4
+
+```{r}
 pander(anova(model4),caption = "Effect of Website version, Portal type and interaction effect on page visits")
 ```
+
+***
+
+#### Model Analysis Results - 5
 
 ```{r, include=FALSE}
 library(AICcmodavg)
@@ -399,15 +454,21 @@ model.names <-c("model0","model1","model2","model3","model4")
 
 
 ```{r}
-pander(aictab(cand.set = models, modnames=model.names))
+pander(aictab(cand.set = models, modnames=model.names),caption= "AIC comparison between models")
 ```
 
-#### Simple effect analysis
+***
+
+#### Simple Effect Analysis - Visual Inspection
 
 ```{r, fig.cap="Bar plot showing the mean page visits per independent variable."}
 bar <- ggplot(web_visit, aes(portal , pages, fill = version))
 bar + stat_summary(fun.y = mean, geom = "bar", position="dodge")
 ```
+
+***
+
+#### Simple Effect Analysis - Results
 
 ```{r, include=FALSE}
 web_visit$simple <- interaction(web_visit$version, web_visit$portal) #merge two factors levels(Lec7g$simple) #to see the level in the new factor
@@ -421,17 +482,25 @@ SimpleEff <- cbind(contrastConsumers,contrastCompanies)
 contrasts(web_visit$simple) <- SimpleEff 
 ```
 
+
+
 ```{r}
 simpleEffectModel <-lm(pages ~ simple , data = web_visit, na.action = na.exclude) 
-pander(summary.lm(simpleEffectModel))
+pander(summary.lm(simpleEffectModel), caption="Simple Effect Analysis of Portal on differences in page visits between website versions.")
 ```
 
+
+***
+
 #### Report section for a scientific publication
+
 A linear model was fitted on the amount of page visits for users of a website, taking as independent variables the website version (new or old) and the user portal (consumer or company). The analysis found a significant main effect ($F(1,995)=36.2,\ p.< 0.01$) for the website version as well as for the portal ($F(995,1)=178.8,\ p.<0.01$). Moreover, the analysis found a significant two-way interaction effect ($F(1,995)=46.2,\ p.<0.01$). A Simple Effect analysis was conducted to further examine the two-way interaction between the independent variables. It revealed a significant ($t=9.22,\ p. 0.01$) difference for website version in the company portal of the website but no significant effect ($t=13.4,\ p=0.67$) for the website version in the consumer portal.
+
+***
 
 ### Bayesian Approach
 
-#### Model description
+#### Model Description
 
 $$
 \begin{aligned}
@@ -445,12 +514,21 @@ d & \sim N(0, 1) \\
 \end{aligned}
 $$
 
+
+***
+
+#### Gamma Distribution?
+
 ```{r, fig.cap="Gamma distribution (1, 2) fitted to data of page visits"}
 p <- web_visit %>% ggplot( aes(x=pages)) + geom_histogram(aes(y =..density..), bins=15) + stat_function(fun = dgamma, args = list(shape = 1, scale=2))
 plot(p)
 ```
 
-#### Model comparison
+
+***
+
+
+#### Model Comparison
 
 ```{r, results = 'hide', include=FALSE}
 web_visit <- subset(web_visit, select = c(pages,version, portal )) 
@@ -505,11 +583,15 @@ m4 <-map2stan( alist(
 plot(compare(m0,m1,m2,m3,m4, func=WAIC))
 ```
 
+***
+
+#### Final Model 
 
 ```{r}
-pander(compare(m0,m1,m2,m3,m4))
-pander(precis(m4, prob= .95))
+pander(precis(m4, prob= .95), caption="Coefficients of the fitted Bayesian model")
 ``` 
+
+***
 
 # Part 3 - Multilevel model
 
@@ -567,9 +649,7 @@ pander(anova(model0, model1), caption = "Model comparison.")
 ```
 
 ### Report section for a scientific publication
-<!--
-Write a small section for a scientific publication, in which you report the results of the analyses, and explain the conclusions that can be drawn.
--->
+
 To investigate whether session has an impact on people's scores and wheter there is a significant variance between the participants in their score, multilevel analysis was performed. A model with a random intercept only and a model with a random intercept and fixed effects were created. There was a significant relationship between session and score, $M = 116.8139$ (95% CI 112.70, 120.93), $p = 0$. The relationship between score and session showed significant variance in intercepts across subjects, $SD = 46.51$ (95% CI 43.67, 49.54), $p = 0$. 
 
 ## Bayesian approach
