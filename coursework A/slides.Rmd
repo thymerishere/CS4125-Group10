@@ -1,5 +1,5 @@
 ---
-title: "Slides coursework assignment A - 2021"
+title: "Coursework assignment A - 2021"
 author: "Thomas Bos, Daniël van Gelder, Jessie van Schijndel"
 output: 
   ioslides_presentation:
@@ -169,6 +169,8 @@ names(semFrame) <- c("Candidate", "score")
 semFrame$Candidate <-factor(semFrame$Candidate, labels=c("Justin Bieber", "Taylor Swift", "Billie Eilish")) 
 ```
 
+***
+
 ### Homogeneity of variance analysis
 
 ```{r, include=FALSE}
@@ -184,6 +186,7 @@ boxplot(semFrame$score ~ semFrame$Candidate)
 pander(leveneTest(semFrame$score, semFrame$Candidate, center = median))
 ```
 
+***
 ### Visual inspection mean and distribution sentiments
 
 ```{r, include=FALSE}
@@ -192,9 +195,13 @@ library(ggplot2)
 p <- semFrame %>% ggplot( aes(x=score)) + geom_histogram( color="#e9ecef", alpha=0.6, position = 'identity') + facet_grid(. ~ Candidate)
 ```
 
+***
+
 ```{r, fig.cap="Bar plot for the tweet sentiment values for each celebrity."}
 plot(p)
 ```
+
+***
 
 ### Frequentist approach
 
@@ -214,6 +221,8 @@ res.aov <- aov(score ~ Candidate, data=semFrame, na.action=na.exclude)
 pander(res.aov)
 ```
 
+*** 
+
 #### Post Hoc analysis
 
 ```{r, include=FALSE}
@@ -223,8 +232,12 @@ library(stats)
 TukeyHSD(res.aov)
 ```
 
+***
+
 #### Report section for a scientific publication
 In order to determine whether sentiment of tweets depend on the celebrity they are about, a null model and a model with celebrity added as a independent variable predictor have been constructed. Results showed that the fit was significantly better ($F(2, 897) = 44.39$, p. < 0.01) with the added predictor. We can therefore conclude that the Twitter user base tweets differently depending on the three celebrities in the data set. Further analysis using Post Hoc analysis using Tukey's Honest Significant Difference test showed that there is a significant difference in tweet sentiment distribution in all three celebrity pairs, Taylor Swift - Justin Bieber (p. < 0.01), and Billie Eilish - Justin Bieber (p. < 0.01), and Taylor Swift - Billie Eilish (p. < 0.01).
+
+***
 
 ### Bayesian Approach
 
@@ -236,20 +249,21 @@ $$
 \end{aligned}
 $$
 
+***
+
 ```{r, include=FALSE}
 semFrame <- subset(semFrame, select = c(score, CandidateF)) 
 x <- seq(-5, 5, length=100)
 y <- dnorm(x, mean=0, sd=2)
 ```
 
-```{r, fig.cap="Sentiment values of all tweets."}
-hist(semFrame$score)
+```{r}
+par(mfrow=c(1,2))
+hist(semFrame$score, main="Sentiment values of all tweets.")
+plot(x, y, type="l", lwd=1, main="Normal distribution with a mean of 0 and a standard deviation of 2.")
 ```
 
-```{r, fig.cap="Normal distribution with a mean of 0 and a standard deviation of 2."}
-plot(x, y, type="l", lwd=1)
-```
-
+***
 
 #### Model comparison
 
