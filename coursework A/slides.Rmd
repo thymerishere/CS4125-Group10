@@ -67,6 +67,11 @@ knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE)
 ![The conceptual model. Different attributes of a celebrity are shown which may influence the sentiment of tweets related to a certain celebrity.](ConceptualModel2.1.pdf)
 
 ```{r, include=FALSE}
+# Enable this for tweet downloading. If set to 'FALSE' semFrame.csv will be loaded.
+download_tweets = FALSE
+```
+
+```{r, include=FALSE}
 
 #during writing you could add "eval = FALSE",  kntr will than not run this code chunk (take some time do)
 
@@ -122,51 +127,58 @@ clearTweets <- function(tweets, excl) {
   return(corpus_clean)
 } 
 
-## capture all the output to a file.
+if (download_tweets) {
+  ## capture all the output to a file.
 
-################# Collect from Twitter
+  ################# Collect from Twitter
+  
+  # for creating a twitter app (apps.twitter.com) see youtube https://youtu.be/lT4Kosc_ers
+  #consumer_key <-'your key'
+  #consumer_scret <- 'your secret'
+  #access_token <- 'your access token'
+  #access_scret <- 'your access scret'
+  
+  source("your_twitter.R") #this file will set my personal variables for my twitter app, adjust the name of this file. use the provide template your_twitter.R
+  
+  setup_twitter_oauth(consumer_key,consumer_scret, access_token,access_scret) #connect to  twitter app
+  
+  ##  Note that it will take the computer some to collect the tweets
+  
+  tweets_J <- searchTwitter("#justinbieber", n=300, lang="en", resultType="recent") #300 recent tweets about Justin Bieber, in English
+  tweets_T <- searchTwitter("#taylorswift", n=300, lang="en", resultType="recent") #300 recent tweets about Taylor Swift, in English
+  tweets_B <- searchTwitter("#billieeilish", n=300, lang="en", resultType="recent") #300 recent tweets about Billie Eilish, in English
+  
+  ######################## Sentiment analysis
+  
+  tweets_J.text <- laply(tweets_J, function(t)t$getText()) #get text out of tweets 
+  tweets_T.text <- laply(tweets_T, function(t)t$getText()) #get text out of tweets
+  tweets_B.text <- laply(tweets_B, function(t)t$getText()) #get text out of tweets
+  
+  #taken from https://github.com/mjhea0/twitter-sentiment-analysis
+  pos <- scan('positive-words.txt', what = 'character', comment.char=';') #read the positive words
+  neg <- scan('negative-words.txt', what = 'character', comment.char=';') #read the negative words
+  
+  source("sentiment3.R") #load algoritm
+  # see sentiment3.R form more information about sentiment analysis. It assigns a intereger score
+  # by substracitng the number of occurrence of negative words from that of positive words
+  
+  analysis_J <- score.sentiment(tweets_J.text, pos, neg)
+  analysis_T <- score.sentiment(tweets_T.text, pos, neg)
+  analysis_B <- score.sentiment(tweets_B.text, pos, neg)
+  
+  
+  sem<-data.frame(analysis_J$score, analysis_T$score, analysis_B$score)
+  
+  
+  semFrame <-melt(sem, measured=c(analysis_J.score,analysis_T.score, analysis_B.score ))
+  names(semFrame) <- c("Candidate", "score")
+  semFrame$Candidate <-factor(semFrame$Candidate, labels=c("Justin Bieber", "Taylor Swift", "Billie Eilish"))
+  write.csv(semFrame, "semFrame.csv", row.names = FALSE)
+} 
 
-# for creating a twitter app (apps.twitter.com) see youtube https://youtu.be/lT4Kosc_ers
-#consumer_key <-'your key'
-#consumer_scret <- 'your secret'
-#access_token <- 'your access token'
-#access_scret <- 'your access scret'
-
-source("your_twitter.R") #this file will set my personal variables for my twitter app, adjust the name of this file. use the provide template your_twitter.R
-
-setup_twitter_oauth(consumer_key,consumer_scret, access_token,access_scret) #connect to  twitter app
-
-##  Note that it will take the computer some to collect the tweets
-
-tweets_J <- searchTwitter("#justinbieber", n=300, lang="en", resultType="recent") #300 recent tweets about Justin Bieber, in English
-tweets_T <- searchTwitter("#taylorswift", n=300, lang="en", resultType="recent") #300 recent tweets about Taylor Swift, in English
-tweets_B <- searchTwitter("#billieeilish", n=300, lang="en", resultType="recent") #300 recent tweets about Billie Eilish, in English
-
-######################## Sentiment analysis
-
-tweets_J.text <- laply(tweets_J, function(t)t$getText()) #get text out of tweets 
-tweets_T.text <- laply(tweets_T, function(t)t$getText()) #get text out of tweets
-tweets_B.text <- laply(tweets_B, function(t)t$getText()) #get text out of tweets
-
-#taken from https://github.com/mjhea0/twitter-sentiment-analysis
-pos <- scan('positive-words.txt', what = 'character', comment.char=';') #read the positive words
-neg <- scan('negative-words.txt', what = 'character', comment.char=';') #read the negative words
-
-source("sentiment3.R") #load algoritm
-# see sentiment3.R form more information about sentiment analysis. It assigns a intereger score
-# by substracitng the number of occurrence of negative words from that of positive words
-
-analysis_J <- score.sentiment(tweets_J.text, pos, neg)
-analysis_T <- score.sentiment(tweets_T.text, pos, neg)
-analysis_B <- score.sentiment(tweets_B.text, pos, neg)
-
-
-sem<-data.frame(analysis_J$score, analysis_T$score, analysis_B$score)
-
-
-semFrame <-melt(sem, measured=c(analysis_J.score,analysis_T.score, analysis_B.score ))
-names(semFrame) <- c("Candidate", "score")
-semFrame$Candidate <-factor(semFrame$Candidate, labels=c("Justin Bieber", "Taylor Swift", "Billie Eilish")) 
+if (!download_tweets) {
+  semFrame = read.csv("semFrame.csv", stringsAsFactors = TRUE)
+}
 ```
 
 ***
