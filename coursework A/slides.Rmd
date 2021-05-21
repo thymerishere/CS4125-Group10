@@ -591,8 +591,6 @@ plot(compare(m0,m1,m2,m3,m4, func=WAIC))
 pander(precis(m4, prob= .95), caption="Coefficients of the fitted Bayesian model")
 ``` 
 
-***
-
 # Part 3 - Multilevel model
 
 ## Visual inspection
@@ -603,10 +601,14 @@ p <- exp_data %>% ggplot( aes(x=score)) + geom_histogram(bins=15) + theme()
 plot(p)
 ```
 
+***
+
 ```{r, fig.cap="Scatterplot relation between score and session"}
 p <- exp_data %>% ggplot( aes(x=session, y=score)) + geom_point(alpha=0.25) + theme()
 plot(p)
 ```
+
+***
 
 ```{r, fig.cap="Mean score and standard error over sessions."}
 library(Rmisc)
@@ -631,18 +633,26 @@ model0 <- lme(score ~ 1 , random = ~1|Subject, data = exp_data, method="ML")
 summary(model0)
 ```
 
+***
+
 ```{r}
 intervals(model0, 0.95)
 ```
+
+***
 
 ```{r}
 model1 <- lme(score ~ session , random = ~1|Subject, data = exp_data, method="ML")
 summary(model1)
 ```
 
+***
+
 ```{r}
 intervals(model1, 0.95)
 ```
+
+***
 
 ```{r}
 pander(anova(model0, model1), caption = "Model comparison.")
@@ -667,6 +677,7 @@ b & \sim N(0, 5) \\
 \sigma & \sim \text{Cauchy}(0,50)T(0, \infty) \\
 \end{aligned}
 $$
+***
 
 ### Model comparison
 
@@ -711,9 +722,13 @@ m2 <-ulam( alist(
 compare(m0,m1,m2)
 ```
 
+***
+
 ```{r fig.cap="Comparing three Bayesian models of increasing complexity."}
 plot(compare(m0,m1,m2))
 ```
+
+***
 
 ### Estimates examination
 
