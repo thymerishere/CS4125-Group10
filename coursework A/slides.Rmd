@@ -1,16 +1,18 @@
 ---
 title: "Coursework assignment A - 2021"
 author: "Thomas Bos, Daniël van Gelder, Jessie van Schijndel"
-output: 
+output:
+  beamer_presentation:
+    incremental: no
   ioslides_presentation:
-    widescreen: true
-    smaller: true
-    incremental: false
+    widescreen: yes
+    smaller: yes
+    incremental: no
 subtitle: CS4125 Seminar Research Methodology for Data Science
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE)
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE)
 ```
 
 # Part 1 - Design and set-up of true experiment 
@@ -30,7 +32,10 @@ knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE)
 
 ## The related conceptual model 
 
-![Conceptual Model underlying the Research Question](Conceptual_Model_A_1.2.png)
+```{r, fig.cap="Conceptual Model underlying this research question", out.width='70%'}
+knitr::include_graphics("Conceptual_Model_A_1.2.png")
+```
+
 
 ## Experimental Design 
 >- Pre-test Post-test randomized controlled trial
