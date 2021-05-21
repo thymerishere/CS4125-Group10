@@ -63,8 +63,20 @@ knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE)
 
 ## Question 1 Twitter sentiment analysis (Between groups - single factor) 
 
+>- Is there a difference in sentiment between the tweets about Justin Bieber, Taylor Swift and Billie Eilish?
+
+***
+
 ### Conceptual model
-![The conceptual model. Different attributes of a celebrity are shown which may influence the sentiment of tweets related to a certain celebrity.](ConceptualModel2.1.pdf)
+>- Celebrity is the main effect
+>- No additional data
+<center>![](ConceptualModel2.1.png){width=50%}</center>
+
+
+```{r, include=FALSE}
+# Enable this for tweet downloading. If set to 'FALSE' semFrame.csv will be loaded.
+download_tweets = FALSE
+```
 
 ```{r, include=FALSE}
 
@@ -122,51 +134,58 @@ clearTweets <- function(tweets, excl) {
   return(corpus_clean)
 } 
 
-## capture all the output to a file.
+if (download_tweets) {
+  ## capture all the output to a file.
 
-################# Collect from Twitter
+  ################# Collect from Twitter
+  
+  # for creating a twitter app (apps.twitter.com) see youtube https://youtu.be/lT4Kosc_ers
+  #consumer_key <-'your key'
+  #consumer_scret <- 'your secret'
+  #access_token <- 'your access token'
+  #access_scret <- 'your access scret'
+  
+  source("your_twitter.R") #this file will set my personal variables for my twitter app, adjust the name of this file. use the provide template your_twitter.R
+  
+  setup_twitter_oauth(consumer_key,consumer_scret, access_token,access_scret) #connect to  twitter app
+  
+  ##  Note that it will take the computer some to collect the tweets
+  
+  tweets_J <- searchTwitter("#justinbieber", n=300, lang="en", resultType="recent") #300 recent tweets about Justin Bieber, in English
+  tweets_T <- searchTwitter("#taylorswift", n=300, lang="en", resultType="recent") #300 recent tweets about Taylor Swift, in English
+  tweets_B <- searchTwitter("#billieeilish", n=300, lang="en", resultType="recent") #300 recent tweets about Billie Eilish, in English
+  
+  ######################## Sentiment analysis
+  
+  tweets_J.text <- laply(tweets_J, function(t)t$getText()) #get text out of tweets 
+  tweets_T.text <- laply(tweets_T, function(t)t$getText()) #get text out of tweets
+  tweets_B.text <- laply(tweets_B, function(t)t$getText()) #get text out of tweets
+  
+  #taken from https://github.com/mjhea0/twitter-sentiment-analysis
+  pos <- scan('positive-words.txt', what = 'character', comment.char=';') #read the positive words
+  neg <- scan('negative-words.txt', what = 'character', comment.char=';') #read the negative words
+  
+  source("sentiment3.R") #load algoritm
+  # see sentiment3.R form more information about sentiment analysis. It assigns a intereger score
+  # by substracitng the number of occurrence of negative words from that of positive words
+  
+  analysis_J <- score.sentiment(tweets_J.text, pos, neg)
+  analysis_T <- score.sentiment(tweets_T.text, pos, neg)
+  analysis_B <- score.sentiment(tweets_B.text, pos, neg)
+  
+  
+  sem<-data.frame(analysis_J$score, analysis_T$score, analysis_B$score)
+  
+  
+  semFrame <-melt(sem, measured=c(analysis_J.score,analysis_T.score, analysis_B.score ))
+  names(semFrame) <- c("Candidate", "score")
+  semFrame$Candidate <-factor(semFrame$Candidate, labels=c("Justin Bieber", "Taylor Swift", "Billie Eilish"))
+  write.csv(semFrame, "semFrame.csv", row.names = FALSE)
+} 
 
-# for creating a twitter app (apps.twitter.com) see youtube https://youtu.be/lT4Kosc_ers
-#consumer_key <-'your key'
-#consumer_scret <- 'your secret'
-#access_token <- 'your access token'
-#access_scret <- 'your access scret'
-
-source("your_twitter.R") #this file will set my personal variables for my twitter app, adjust the name of this file. use the provide template your_twitter.R
-
-setup_twitter_oauth(consumer_key,consumer_scret, access_token,access_scret) #connect to  twitter app
-
-##  Note that it will take the computer some to collect the tweets
-
-tweets_J <- searchTwitter("#justinbieber", n=300, lang="en", resultType="recent") #300 recent tweets about Justin Bieber, in English
-tweets_T <- searchTwitter("#taylorswift", n=300, lang="en", resultType="recent") #300 recent tweets about Taylor Swift, in English
-tweets_B <- searchTwitter("#billieeilish", n=300, lang="en", resultType="recent") #300 recent tweets about Billie Eilish, in English
-
-######################## Sentiment analysis
-
-tweets_J.text <- laply(tweets_J, function(t)t$getText()) #get text out of tweets 
-tweets_T.text <- laply(tweets_T, function(t)t$getText()) #get text out of tweets
-tweets_B.text <- laply(tweets_B, function(t)t$getText()) #get text out of tweets
-
-#taken from https://github.com/mjhea0/twitter-sentiment-analysis
-pos <- scan('positive-words.txt', what = 'character', comment.char=';') #read the positive words
-neg <- scan('negative-words.txt', what = 'character', comment.char=';') #read the negative words
-
-source("sentiment3.R") #load algoritm
-# see sentiment3.R form more information about sentiment analysis. It assigns a intereger score
-# by substracitng the number of occurrence of negative words from that of positive words
-
-analysis_J <- score.sentiment(tweets_J.text, pos, neg)
-analysis_T <- score.sentiment(tweets_T.text, pos, neg)
-analysis_B <- score.sentiment(tweets_B.text, pos, neg)
-
-
-sem<-data.frame(analysis_J$score, analysis_T$score, analysis_B$score)
-
-
-semFrame <-melt(sem, measured=c(analysis_J.score,analysis_T.score, analysis_B.score ))
-names(semFrame) <- c("Candidate", "score")
-semFrame$Candidate <-factor(semFrame$Candidate, labels=c("Justin Bieber", "Taylor Swift", "Billie Eilish")) 
+if (!download_tweets) {
+  semFrame = read.csv("semFrame.csv", stringsAsFactors = TRUE)
+}
 ```
 
 ***
@@ -178,16 +197,31 @@ library(car)
 library(pander)
 ```
 
-```{r, fig.cap="Boxplot of the sentiment values of the tweets for each celebrity."}
+#### Boxplot
+>- Tweets about Billie Eilish most negative
+>- Justin Bieber's and Taylor Swift's are similar
+>- Justin Bieber's bit more spread
+
+```{r}
 boxplot(semFrame$score ~ semFrame$Candidate)
 ```
 
-```{r, fig.cap="Results of performing Levene's test on the three groups of tweets about the three celebrities."}
+***
+
+
+#### Levene Test
+>- Levene test to test for Homogeneity of Variance
+>- No Homogeneity of Variance (p < 0.01)
+>- Population variances are not equal
+
+```{r}
 pander(leveneTest(semFrame$score, semFrame$Candidate, center = median))
 ```
 
 ***
 ### Visual inspection mean and distribution sentiments
+>- Tweets about Billie Eilish most neutral
+>- Tweets about Justin Bieber more positive than Taylor Swift
 
 ```{r, include=FALSE}
 library(ggplot2)
@@ -195,9 +229,7 @@ library(ggplot2)
 p <- semFrame %>% ggplot( aes(x=score)) + geom_histogram( color="#e9ecef", alpha=0.6, position = 'identity') + facet_grid(. ~ Candidate)
 ```
 
-***
-
-```{r, fig.cap="Bar plot for the tweet sentiment values for each celebrity."}
+```{r}
 plot(p)
 ```
 
@@ -205,7 +237,17 @@ plot(p)
 
 ### Frequentist approach
 
+>- Create linear model using aov
+>   - Is there a difference in means?
+>- Post-Hoc Analyis (TukeyHSD)
+>   - Where lie the differences?
+
+***
+
 #### Linear model
+
+>- Difference in means?
+>- Pr(>F) < 0.01 -> Yes!
 
 ```{r, include = FALSE}
 #include your code and output in the document
@@ -217,55 +259,70 @@ semFrame$CandidateF <-factor(semFrame$Candidate, levels =c("Justin Bieber", "Tay
 res.aov <- aov(score ~ Candidate, data=semFrame, na.action=na.exclude)
 ```
 
-``` {r fig.cap="Effect pre-post measuring condition on the tweet sentiments of the three celebrities."}
+``` {r}
 pander(res.aov)
 ```
 
 *** 
 
 #### Post Hoc analysis
+>- Further analysis...
+>- Do the celebrities differ from each other?
+>- Significant (p < 0.01) difference in means for all celebrity pairs
 
 ```{r, include=FALSE}
 library(stats)
 ```
-```{r, fig.cap="Results of performing Tukey's HSD."}
+```{r }
 TukeyHSD(res.aov)
 ```
 
 ***
 
 #### Report section for a scientific publication
-In order to determine whether sentiment of tweets depend on the celebrity they are about, a null model and a model with celebrity added as a independent variable predictor have been constructed. Results showed that the fit was significantly better ($F(2, 897) = 44.39$, p. < 0.01) with the added predictor. We can therefore conclude that the Twitter user base tweets differently depending on the three celebrities in the data set. Further analysis using Post Hoc analysis using Tukey's Honest Significant Difference test showed that there is a significant difference in tweet sentiment distribution in all three celebrity pairs, Taylor Swift - Justin Bieber (p. < 0.01), and Billie Eilish - Justin Bieber (p. < 0.01), and Taylor Swift - Billie Eilish (p. < 0.01).
+In order to determine whether sentiment of tweets depend on the celebrity they are about, a null model and a model with celebrity added as a independent variable predictor have been constructed. Results showed that the fit was significantly better ($F(2, 897) = 63.49$, p. < 0.01) with the added predictor. We can therefore conclude that the Twitter user base tweets differently depending on the three celebrities in the data set. Further analysis using Post Hoc analysis using Tukey's Honest Significant Difference test showed that there is a significant difference in tweet sentiment distribution in all three celebrity pairs, Taylor Swift - Justin Bieber (p. < 0.01), and Billie Eilish - Justin Bieber (p. < 0.01), and Taylor Swift - Billie Eilish (p. < 0.01).
 
 ***
 
 ### Bayesian Approach
 
+>- Same questions as frequentist
+>- Define priors
+>- Create Bayesian models
+>- T-test to compare celebrity pairs
+
+***
+
 #### Model description
+
+>- Sentiment values between -5 and 5
+>- Mean about 1
 
 $$
 \begin{aligned}
-\mu_{\text{celebrity}} & = N(a_{\text{celebrity}}, \sigma) \\ a & \sim N(0, 2) \\ \sigma & \sim U(0.0001, 5)
+\mu_{\text{celebrity}} & = N(a_{\text{celebrity}}, \sigma) \\ a & \sim N(1, 2) \\ \sigma & \sim U(0.0001, 5)
 \end{aligned}
 $$
-
-***
 
 ```{r, include=FALSE}
 semFrame <- subset(semFrame, select = c(score, CandidateF)) 
 x <- seq(-5, 5, length=100)
-y <- dnorm(x, mean=0, sd=2)
+y <- dnorm(x, mean=1, sd=2)
 ```
 
 ```{r}
 par(mfrow=c(1,2))
-hist(semFrame$score, main="Sentiment values of all tweets.")
-plot(x, y, type="l", lwd=1, main="Normal distribution with a mean of 0 and a standard deviation of 2.")
+hist(semFrame$score, main="Sentiment values")
+plot(x, y, type="l", lwd=1, main="Norm(1, 2)")
 ```
 
 ***
 
-#### Model comparison
+#### Creating the model
+>- Two models
+>   - Base model
+>   - Model with celebrity as predictor
+>- Parameters for second model:
 
 ```{r, results='hide', include=FALSE}
 library("rstan")
@@ -275,7 +332,7 @@ m0 <-ulam(
   alist(
     score ~ dnorm(mu, sigma), 
     mu <- a,
-    a ~ dnorm(0, 2),
+    a ~ dnorm(1, 2),
     sigma ~ dunif(0.0001, 5)),  
   data =  semFrame ,iter = 10000, chains = 4, cores = 4, control=list(adapt_delta=.99), log_lik=TRUE
 )
@@ -285,20 +342,30 @@ m1 <-ulam(
    score ~ dnorm(mu, sigma),
    mu <- a[CandidateF] ,
    sigma ~  dunif(0.0001, 5),
-   a[CandidateF] ~ dnorm(0, 2)),
+   a[CandidateF] ~ dnorm(1, 2)),
  data =  semFrame ,iter = 10000, chains = 4, cores = 4, control=list(adapt_delta=.99), log_lik=TRUE
 )
 ```
 
-```{r fig.cap="Confidence intervals for the parameters of the model with celebrity added as a predictor."}
+```{r}
 plot(precis(m1, depth=2, prob = .95))
 ```
+***
+
+#### Comparing the fit
+
+>- Second model has lower WAIC
+>- -> Second model has better fit
 
 ```{r fig.cap="Comparison of the WAIC score for each model."}
 plot(compare(m0, m1, func=WAIC))
 ```
 
 #### Comparison celebrity pair
+
+>- We know celebrity is main effect
+>- How do celebrities differ between each other?
+>- Bayes.t.test
 
 ```{r, include=FALSE}
 library(rjags)
@@ -309,19 +376,28 @@ tsSub <- subset(semFrame, (CandidateF == "Taylor Swift"))
 beSub <- subset(semFrame, (CandidateF == "Billie Eilish"))
 ```
 
+***
+
 ``` {r, fig.cap="Results of performing the bayes t-test on the pair Justin Bieber - Taylor Swift."}
 plot(bayes.t.test(jbSub$score, tsSub$score))
 ```
 
+***
+
 ``` {r, fig.cap="Results of performing the bayes t-test on the pair Justin Bieber - Billie Eilish."}
 plot(bayes.t.test(jbSub$score, beSub$score))
 ```
+
+***
 
 ``` {r, fig.cap="Results of performing the bayes t-test on the pair Taylor Swift - Billie Eilish."}
 plot(bayes.t.test(tsSub$score, beSub$score))
 ```
 
 ***
+
+#### Conclusions Celebrity Pair Comparison
+>- Significant difference (p < 0.01)
 
 ## Question 2 - Website visits (between groups - Two factors)
 
