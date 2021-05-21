@@ -753,6 +753,7 @@ b & \sim N(0, 5) \\
 \sigma & \sim \text{Cauchy}(0,50)T(0, \infty) \\
 \end{aligned}
 $$
+
 ***
 
 ### Model comparison
