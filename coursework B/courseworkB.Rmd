@@ -61,9 +61,21 @@ First we evaluate if there is a difference between the means of the baseline mod
 library(pander)
 
 d$modeltype <-factor(d$modeltype == "B",labels=c("Transfer Learning","Baseline"))
-pander(t.test(score ~ modeltype, data = d))
+
 ```
 
+```{r homogeniety of variance}
+library(car)
+CG <- subset(d, modeltype == "Transfer Learning")
+TG <- subset(d, modeltype != "Transfer Learning")
+var.test(CG$score, TG$score)
+leveneTest(d$score, d$modeltype)
+```
+
+
+```{r}
+pander(t.test(score ~ modeltype, data = d))
+```
 To evaluate whether the test dataset is of influence on whether transfer learning improves we set up a linear mixed effects model.
 
 ```{r}
@@ -85,7 +97,7 @@ library(emmeans)
 library(pander)
 
 m <- lm(score ~ modeltype*TeD, d)
-pairs(emmeans(m, ~modeltype))
+pairs(emmeans(m, ~modeltype | TeD))
 ```
 
 <!-- Nog wat toevoegen over p value ajustment (wat wordt gedaan door emmeans) -->
@@ -95,15 +107,27 @@ dtl <- d[which(d$modeltype == "Transfer Learning" & d$model != "B1" & d$model !=
 m <- lm(score ~ model*TeD, dtl)
 em <- emmeans(m, ~model)
 plot(em)
+ggsave("emmeans_refinement.pdf")
+pairs(em)
+```
+``` {r}
+dtl <- d[which(d$modeltype == "Transfer Learning" & d$model != "B1" & d$model != "B2"), c("model", "TeD", "score")]
+dtl$singleTrain <-factor(dtl$model == "S",labels=c("Two or More Training Sets", "Single Training Set"))
+
+m <- lm(score ~ singleTrain*TeD, dtl)
+em <- emmeans(m, ~singleTrain)
+plot(em)
+ggsave("single_train.pdf")
 pairs(em)
 ```
 
 We will now investigate the influence of refinement of the models on the mean scores on the different test sets. From the boxplots it looks like refinement increases the mean score on all test data sets, although on TeD1 the median has decreased with full model refinement.
-``` {r}
+``` {r, fig.width=10, fig.height=4}
 library(ggplot2)
 dtlr <- d[which(d$model == "MN" | d$model == "M1" | d$model == "M2" | d$model == "M3" | d$model == "MF" ), c("model", "TeD", "score")]
 dtlr$model <- factor(dtlr$model, levels=c("MN", "M1", "M2", "M3", "MF"))
 ggplot(dtlr, aes(model, score)) + geom_boxplot() + facet_grid(~TeD)
+ggsave("boxplots_refinement.pdf", plot=last_plot())
 ```
 Carrying out pairwise comparisons of each model while faceting by test set shows that on all test sets except TeD5 there is a significant improvement (p < 0.01) in doing any level of refinement. However, refining more than one component of the model gives only significantly better results (p < 0.05) on some of the test sets (TeD1, TeD2, TeD4, TeD7).
 ``` {r}
@@ -135,6 +159,7 @@ library(jtools)
 summary(model0)
 intervals(model0, 0.95)
 plot(model0)
+plot(model1)
 ```
 
 ```{r}
