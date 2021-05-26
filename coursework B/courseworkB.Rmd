@@ -19,7 +19,7 @@ table(d$model, d$TeD)
 d$modeltype = factor(substring(d$model, 1, 1))
 d$modelnr = factor(substring(d$model, 2))
 temp = subset(d, select=c("TrD1", "TrD2", "TrD3", "TrD4", "TrD5", "TrD6", "TrD7", "TrD8"))
-d$trdcount = factor(rowSums(temp, dims=1))
+d$trdcount = rowSums(temp, dims=1)
 d$model = factor(d$model)
 ```
 
@@ -76,7 +76,6 @@ intervals(model0, 0.95)
 summary(model1)
 intervals(model1, 0.95)
 pander(anova(model0, model1), caption = "Model comparison.")
-
 ```
 First we analyse whether transfer learning achieves a better mean score on all test sets. Results show a significant score increase (p < 0.01) of 0.118 when transfer learning is used.
 ``` {r}
@@ -118,38 +117,58 @@ pairs(emmeans(m, ~model | TeD))
 *What is the effect of the TrD’s on the final model performance?*
 
 ```{r}
+cols <- c("TrD1", "TrD2", "TrD3", "TrD4", "TrD5", "TrD6", "TrD7", "TrD8")
+d[cols] <- lapply(d[cols], factor)
+d$trdcount = factor(d$trdcount)
+```
+
+```{r}
+library(nlme)
 model0 <- lme(score ~ 1, random = ~1|TeD, data = d, method="ML")
-model1 <- lme(score ~ TrD1 + TrD2 + TrD3 + TrD4 + TrD5 + TrD6 + TrD8, random = ~1|TeD, data = d, method="ML")
-```
-
-```{r}
-summary(model0)
-```
-
-```{r}
-intervals(model0, 0.95)
+model1 <- lme(score ~ TrD1 + TrD2 + TrD3 + TrD4 + TrD5 + TrD6 + TrD7 + TrD8, random = ~1|TeD, data = d, method="ML")
+model2 <- lme(score ~ trdcount, random = ~1|TeD, data = d, method="ML")
 ```
 
 ```{r}
 library(jtools)
 
-layout(matrix(c(1,2,3,4),2,2))
+summary(model0)
+intervals(model0, 0.95)
 plot(model0)
 ```
 
 ```{r}
 summary(model1)
-```
-
-```{r}
 intervals(model1, 0.95)
-```
-
-```{r}
-pander(anova(model0, model1), caption = "Model comparison between model 0 and model 1"
-)
-```
-
-```{r}
 plot(model1)
 ```
+```{r}
+summary(model2)
+intervals(model2, 0.95)
+plot(model2)
+```
+
+```{r}
+library(pander)
+pander(anova(model0, model1), caption = "Model comparison between model 0 and model 1")
+pander(anova(model1, model2), caption = "Model comparison between model 0 and model 1")
+```
+
+```{r fig.width=7, fig.height=4}
+ggplot(d, aes(x=trdcount, y=score)) + geom_boxplot()
+```
+```{r}
+emmeans(model2, ~trdcount)
+```
+
+
+```{r}
+require(lme4)
+model3 <- glmer(score ~ trdcount + (1 | TeD), data=d)
+model2 <- glme(score ~ trdcount + (1 | TeD), data = d)
+pander(anova(model2, model3), caption = "Model comparison between model 2 and model 3")
+summary(model3)
+intervals(model3, 0.95)
+plot(model3)
+```
+
