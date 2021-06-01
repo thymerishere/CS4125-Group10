@@ -55,27 +55,35 @@ ggplot(d, aes(x=trdcount, y=score)) + geom_boxplot(outlier.shape = NA) + geom_ji
 
 *How much does transfer learning improve over typical non-transfer learning?*
 
+Data analysis
+
+Visualizing score distribution across TeDs.
+``` {r}
+p <- ggplot(dtask, aes(x=score, fill=TeD)) + geom_density(position = "stack", size=0.1) + facet_grid(~modeltype)
+ggsave("score_density.pdf", width=5, height=3)
+p
+```
+Visualizing score distribution across tasks.
+``` {r}
+dtask <- data.frame(d)
+my_map <- c("TeD1"="Classification", "TeD2"="Classification", "TeD3"="Classification", "TeD4"="Classification", "TeD5"="Recommendation", "TeD6"="Regression", "TeD7"="Regression")
+dtask$task <- my_map[dtask$TeD]
+ggplot(dtask, aes(x=score, fill=task)) + geom_density(position = "stack", size=0.1) + facet_grid(~modeltype)
+ggsave("scores_task_density.pdf", width=6,height=3)
+```
+Visualizing score distributions of only the transfer learning models across tasks.
+``` {r}
+dtl <- d[which((d$modeltype == "M" | d$modeltype == "S") & d$model != "B1" & d$model != "B2" & d$TeD != "TeD5"), c("model", "TeD", "score")]
+ggplot(dtl, aes(y=score, fill=model)) + geom_density(position = "stack", size=0.1) + facet_grid(~TeD)
+ggsave("scores_per_ted_only_tf.pdf", width=10, height=4)
+```
+``` {r}
+dtl <- d[which((d$modeltype == "M" | d$modeltype == "S") & d$model != "B1" & d$model != "B2" & d$TeD == "TeD5"), c("model", "TeD", "score")]
+ggplot(dtl, aes(x=score, fill=model)) + geom_density(position = "stack", size=0.1) + facet_grid(~TeD)
+ggsave("scores_per_ted_only_tf_only_ted5.pdf", height=2, width=3)
+```
+
 First we evaluate if there is a difference between the means of the baseline model scores and the non-baseline (transfer learning) model scores.
-
-```{r}
-library(pander)
-
-d$modeltype <-factor(d$modeltype == "B",labels=c("Transfer Learning","Baseline"))
-
-```
-
-```{r homogeniety of variance}
-library(car)
-CG <- subset(d, modeltype == "Transfer Learning")
-TG <- subset(d, modeltype != "Transfer Learning")
-var.test(CG$score, TG$score)
-leveneTest(d$score, d$modeltype)
-```
-
-
-```{r}
-pander(t.test(score ~ modeltype, data = d))
-```
 To evaluate whether the test dataset is of influence on whether transfer learning improves we set up a linear mixed effects model.
 
 ```{r}
