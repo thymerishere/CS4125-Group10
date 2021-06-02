@@ -151,7 +151,6 @@ pairs(emmeans(m, ~model | TeD))
 ```{r}
 cols <- c("TrD1", "TrD2", "TrD3", "TrD4", "TrD5", "TrD6", "TrD7", "TrD8")
 d[cols] <- lapply(d[cols], factor)
-d$trdcount = factor(d$trdcount)
 ```
 
 ```{r}
