@@ -1,11 +1,48 @@
 function Task2()
+    %% Plots of data transformed using PCA modes
+
+
     DrivFace = load("data/DrivFace/DrivFace.mat"); % http://archive.ics.uci.edu/ml/datasets/DrivFace
     DFdata = DrivFace.drivFaceD.data;
-    [U1, e1] = nystrom_method(DFdata.',2 , 10); % execute with transpose in order to get a matrix of n x m
-    [U2, e2] = snapshot_pca(DFdata.', 2, 200); % execute with transpose in order to get a matrix of n x m
+    labels = DrivFace.drivFaceD.nlab; 
+    M = DFdata;
+    Y = labels;
+ 
+    size(M)
+    
+    [U1, e1] = nystrom_method(M.', 2, 500); % execute with transpose in order to get a matrix of n x m
+    [U2, e2] = snapshot_pca(M.', 2, 100); % execute with transpose in order to get a matrix of n x m
+    D1 = (M - mean(M,2)) * U1;
+    D2 = (M - mean(M,2)) * U2;
+    figure
+    gscatter(D1(:,1),D1(:,2), Y)
+    figure
+    gscatter(D2(:,1),D2(:,2), Y)
+    
+    %% Graphs plotting experiment of Time/RE tradeoff for L
+    L1 = [605, 500, 400, 300, 200, 100, 50, 25, 10];
+    L2 = [6399, 5000, 4000, 3000, 2000, 1000, 500, 250, 100, 50];
 
-    e1
-    e2
+    [T1,E1,T2,E2] = experiment_data(L1, L2);
+    figure
+    yyaxis left
+    errorbar(L1,mean(T1,2),std(T1,0,2))
+    title("Execution Time and RE over varying values of L running Snapshot PCA")
+    hold on
+    yyaxis right
+    errorbar(L1,mean(E1,2),std(E1,0,2))
+    legend('Time in seconds', 'Reconstruction Error', 'Location','northwest')
+    hold off
+    figure
+    yyaxis left
+    errorbar(L2,mean(T2,2),std(T2,0,2))
+    title("Execution Time and RE over varying values of L running Nystrom")
+    hold on
+    yyaxis right
+    errorbar(L2,mean(E2,2),std(E2,0,2))
+    legend('Time in seconds', 'Reconstruction Error', 'Location','northwest')
+    hold off
+    
 end
 
 function [U, e] = snapshot_pca(M, d, l)
@@ -30,22 +67,21 @@ function [U, e] = snapshot_pca(M, d, l)
     % Get max d eigenvalues with their eigenvectors
     [K, I] = maxk(L, d);  % I stores the indices of top eigenvalues
     
-    % Compute the basis vectors of the affine spaces
+    % Compute the basis vectors of the affine subspace
     U = zeros(n, d);
     for i = 1:d
         % Map eigenvectors from R^m to R^n
         U(:,i) = 1/sqrt(L(I(i))) * subY * V(:,I(i)); % calculate basis vectors b
+%         U(:,i) = norm(U(:,i));
     end
     
     %% Reconstruction error
-    % Center vector is replicated to size of data matrix
-    C = repmat(center, n, 1).';
     % Map centered data onto affine subspace and map back
-    A = (Y.' * U)* U.' + C;
+    A = Y.' * (U * U.');
     % Square all errors
-    E = (M - A.').^2;
+    E = (Y - A.').^2;
     % Compute error 
-    e = sum(E, 'all');
+    e = sqrt(sum(E, 'all'));
 end
 
 function [U, e] = nystrom_method(M, d, l)
@@ -92,13 +128,46 @@ function [U, e] = nystrom_method(M, d, l)
     U = U(:, 1:d);  
     
     %% Reconstruction error
-    % Center vector is replicated to size of data matrix
-    C = repmat(center, n, 1).';
     % Map centered data onto affine subspace and map back
-    A = (Y.' * U)* U.' + C;
+    A = Y.' * (U * U.');
     % Square all errors
-    E = (M - A.').^2;
+    E = (Y - A.').^2;
     % Compute error 
-    e = sum(E, 'all');
+    e = sqrt(sum(E, 'all'));
 end
 
+
+function [T1, E1, T2, E2] = experiment_data(L1,L2)
+    DrivFace = load("data/DrivFace/DrivFace.mat"); % http://archive.ics.uci.edu/ml/datasets/DrivFace
+    DFdata = DrivFace.drivFaceD.data;
+
+    %L1 = [605, 500, 400, 300, 200, 100, 50, 25, 10];
+    %L2 = [6399, 5000, 4000, 3000, 2000, 1000, 500, 250, 100, 50];
+    
+    d = 2;
+    
+    T1 = [];
+    E1 = [];
+    for i = 1:size(L1,2)
+        l = L1(i);
+        for j = 1:50
+            tic 
+            [U, E1(i,j)] = snapshot_pca(DFdata.', d, l);
+            T1(i,j) = toc;
+        end 
+    end 
+    "Executed Snapshot PCA"
+    
+    T2 = [];
+    E2 = [];
+    for i = 1:size(L2,2)
+        l = L2(i);
+        for j = 1:5
+            tic 
+            [U, E2(i,j)] = nystrom_method(DFdata.', d, l);
+            T2(i,j) = toc;
+        end 
+    end 
+    "Executed Nystrom Method"
+    
+end
