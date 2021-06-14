@@ -91,7 +91,7 @@ Participants should be students and could be recruited by asking for volunteers 
 <!-- 
 Describe the statistical test you suggest to care out on the collected data 
 -->
-First, we determine our null hypothesis $H_0$ and alternative hypothesis $H_1$. Our null hypothesis states that there is no difference in student understanding of the lecture material between the two different conditions. Our alternative hypothesis states that there is a difference in student understanding. We create two linear models to predict student understanding of lecture material. First, we create a model which has only an intercept. This model does not use the information about which condition a participant was in. This model will be referred to as $m_0$. Second, we create a model which does include this information ass a predictor. This model will be referred to as $m_1$. Then, we compare the fits of the two models to the data. We determine whether $m_1$ fits significantly better than $m_0$ through an ANOVA F-test. If this is not the case, we cannot reject our null hypothesis. We may also inspect the significance of the parameters of $m_1$. If the effect of the condition parameter is not significant, we cannot reject our null hypothesis.
+First, we determine our null hypothesis $H_0$ and alternative hypothesis $H_1$. Our null hypothesis states that there is no difference in student understanding of the lecture material between the two different conditions. Our alternative hypothesis states that there is a difference in student understanding. We create two linear models to predict student understanding of lecture material. First, we create a model which has only an intercept. This model does not use the information about which condition a participant was in. This model will be referred to as $m_0$. Second, we create a model which does include this information as a predictor. This model will be referred to as $m_1$. Then, we compare the fits of the two models to the data. We determine whether $m_1$ fits significantly better than $m_0$ through an ANOVA F-test. If this is not the case, we cannot reject our null hypothesis. We may also inspect the significance of the parameters of $m_1$. If the effect of the condition parameter is not significant, we cannot reject our null hypothesis.
 
 # Part 2 - Generalized linear models
 
@@ -99,19 +99,22 @@ First, we determine our null hypothesis $H_0$ and alternative hypothesis $H_1$. 
 
 ### Conceptual model
 <!-- Make a conceptual model for the following research question: Is there a difference in the sentiment of the tweets related to the different celebrities? -->
-![The conceptual model. Different attributes of a celebrity are shown which may influence the sentiment of tweets related to a certain celebrity.](ConceptualModel2.1.pdf)
+![The conceptual model for the research question. The model is simple, as we only have tweet sentiment score and which celebrity the tweet is about.](ConceptualModel2.1.pdf)
 
 ### Collecting tweets, and data preparation
 <!-- Include the annotated R script (excluding your personal Keys and Access Tokens information), but put echo=FALSE, so code is not included in the output pdf file. -->
-<!-- TODO: Dit willen we misschien dubbel checken voordat we hem inleveren -->
-Note from the author: as this data is updated with each run, analyses may not reflect accompanying graphs in certain sections as they were performed on older data.
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, include = FALSE}
+```{r, include=FALSE}
+# Enable this for tweet downloading. If set to 'FALSE' semFrame.csv will be loaded.
+download_tweets = FALSE
+```
+
+```{r, include=FALSE}
 
 #during writing you could add "eval = FALSE",  kntr will than not run this code chunk (take some time do)
 
-source("working_dir.R")
-setwd(wd) 
+#source("working_dir.R")
+#setwd(wd) 
 # apple , note use / instead of \, which used by windows
 
 
@@ -162,51 +165,58 @@ clearTweets <- function(tweets, excl) {
   return(corpus_clean)
 } 
 
-## capture all the output to a file.
+if (download_tweets) {
+  ## capture all the output to a file.
 
-################# Collect from Twitter
+  ################# Collect from Twitter
+  
+  # for creating a twitter app (apps.twitter.com) see youtube https://youtu.be/lT4Kosc_ers
+  #consumer_key <-'your key'
+  #consumer_scret <- 'your secret'
+  #access_token <- 'your access token'
+  #access_scret <- 'your access scret'
+  
+  source("your_twitter.R") #this file will set my personal variables for my twitter app, adjust the name of this file. use the provide template your_twitter.R
+  
+  setup_twitter_oauth(consumer_key,consumer_scret, access_token,access_scret) #connect to  twitter app
+  
+  ##  Note that it will take the computer some to collect the tweets
+  
+  tweets_J <- searchTwitter("#justinbieber", n=300, lang="en", resultType="recent") #300 recent tweets about Justin Bieber, in English
+  tweets_T <- searchTwitter("#taylorswift", n=300, lang="en", resultType="recent") #300 recent tweets about Taylor Swift, in English
+  tweets_B <- searchTwitter("#billieeilish", n=300, lang="en", resultType="recent") #300 recent tweets about Billie Eilish, in English
+  
+  ######################## Sentiment analysis
+  
+  tweets_J.text <- laply(tweets_J, function(t)t$getText()) #get text out of tweets 
+  tweets_T.text <- laply(tweets_T, function(t)t$getText()) #get text out of tweets
+  tweets_B.text <- laply(tweets_B, function(t)t$getText()) #get text out of tweets
+  
+  #taken from https://github.com/mjhea0/twitter-sentiment-analysis
+  pos <- scan('positive-words.txt', what = 'character', comment.char=';') #read the positive words
+  neg <- scan('negative-words.txt', what = 'character', comment.char=';') #read the negative words
+  
+  source("sentiment3.R") #load algoritm
+  # see sentiment3.R form more information about sentiment analysis. It assigns a intereger score
+  # by substracitng the number of occurrence of negative words from that of positive words
+  
+  analysis_J <- score.sentiment(tweets_J.text, pos, neg)
+  analysis_T <- score.sentiment(tweets_T.text, pos, neg)
+  analysis_B <- score.sentiment(tweets_B.text, pos, neg)
+  
+  
+  sem<-data.frame(analysis_J$score, analysis_T$score, analysis_B$score)
+  
+  
+  semFrame <-melt(sem, measured=c(analysis_J.score,analysis_T.score, analysis_B.score ))
+  names(semFrame) <- c("Candidate", "score")
+  semFrame$Candidate <-factor(semFrame$Candidate, labels=c("Justin Bieber", "Taylor Swift", "Billie Eilish"))
+  write.csv(semFrame, "semFrame.csv", row.names = FALSE)
+} 
 
-# for creating a twitter app (apps.twitter.com) see youtube https://youtu.be/lT4Kosc_ers
-#consumer_key <-'your key'
-#consumer_scret <- 'your secret'
-#access_token <- 'your access token'
-#access_scret <- 'your access scret'
-
-source("your_twitter.R") #this file will set my personal variables for my twitter app, adjust the name of this file. use the provide template your_twitter.R
-
-setup_twitter_oauth(consumer_key,consumer_scret, access_token,access_scret) #connect to  twitter app
-
-##  Note that it will take the computer some to collect the tweets
-
-tweets_J <- searchTwitter("#justinbieber", n=300, lang="en", resultType="recent") #300 recent tweets about Justin Bieber, in English
-tweets_T <- searchTwitter("#taylorswift", n=300, lang="en", resultType="recent") #300 recent tweets about Taylor Swift, in English
-tweets_B <- searchTwitter("#billieeilish", n=300, lang="en", resultType="recent") #300 recent tweets about Billie Eilish, in English
-
-######################## Sentiment analysis
-
-tweets_J.text <- laply(tweets_J, function(t)t$getText()) #get text out of tweets 
-tweets_T.text <- laply(tweets_T, function(t)t$getText()) #get text out of tweets
-tweets_B.text <- laply(tweets_B, function(t)t$getText()) #get text out of tweets
-
-#taken from https://github.com/mjhea0/twitter-sentiment-analysis
-pos <- scan('positive-words.txt', what = 'character', comment.char=';') #read the positive words
-neg <- scan('negative-words.txt', what = 'character', comment.char=';') #read the negative words
-
-source("sentiment3.R") #load algoritm
-# see sentiment3.R form more information about sentiment analysis. It assigns a intereger score
-# by substracitng the number of occurrence of negative words from that of positive words
-
-analysis_J <- score.sentiment(tweets_J.text, pos, neg)
-analysis_T <- score.sentiment(tweets_T.text, pos, neg)
-analysis_B <- score.sentiment(tweets_B.text, pos, neg)
-
-
-sem<-data.frame(analysis_J$score, analysis_T$score, analysis_B$score)
-
-
-semFrame <-melt(sem, measured=c(analysis_J.score,analysis_T.score, analysis_B.score ))
-names(semFrame) <- c("Candidate", "score")
-semFrame$Candidate <-factor(semFrame$Candidate, labels=c("Justin Bieber", "Taylor Swift", "Billie Eilish")) 
+if (!download_tweets) {
+  semFrame = read.csv("semFrame.csv", stringsAsFactors = TRUE)
+}
 ```
 
 ### Homogeneity of variance analysis
@@ -227,7 +237,7 @@ pander(leveneTest(semFrame$score, semFrame$Candidate, center = median))
 
 ### Visual inspection Mean and distribution sentiments
 <!-- Graphically examine the mean and distribution sentiments of tweets for each celebrity, and provide interpretation -->
-Analysing the bar graph of sentiment counts for all tweets for each celebrity, we can see that in general tweets about Justin Bieber are most neutral, with most tweets having a sentiment of either 0 or 0.5, while tweets about Taylor Swift vary greatly, having sentiment values between -1 and 4. Tweets about Billie Eilish are the most negative and also have the most tweets with value 0.
+Analysing the bar graph of sentiment counts for all tweets for each celebrity, we can see that in general tweets about Justin Bieber are the most positive, with most tweets having a sentiment around 0.5, while tweets about Taylor Swift are a bit less positive. Tweets about Billie Eilish are the most negative, or rather, most neutral with the most tweets having sentiment values of 0.
 
 ```{r, message=FALSE, warning=FALSE, echo = T, results = 'hide', cache=TRUE}
 library(ggplot2)
@@ -242,67 +252,79 @@ plot(p)
 
 #### Linear model
 <!-- Use a linear model to analyze whether the knowledge to which celebrity a tweet relates has a significant impact on explaining the sentiments of the tweets. Provide interpretation of results  -->
-The results of performing an F-test on a null model and a model where the celebrity is added as a independent variable show that there is a significant improvement with the latter model with respect to the quality of the fit. This means that knowing the celebrity gives information about the distribution of tweet sentiments in the data set.
+Comparing the AIC of a null model ($m_0$) and a model where celebrity is added as a predictor ($m_1$) shows that there is an improvement with the latter model with respect to the quality of the fit, as the AIC is lower with $m_1$. Performing an F-test shows that there is a significant difference in fit between both models. This means that knowing the celebrity gives information about the distribution of tweet sentiments in the data set.
 
 ```{r, message=FALSE, warning=FALSE, echo = T, results = 'hide', cache=TRUE}
-#include your code and output in the document
 library(pander)
 library(multcomp)
+library(stats)
+library(AICcmodavg)
 
-semFrame$CandidateF <-factor(semFrame$Candidate, levels =c("Justin Bieber", "Taylor Swift", "Billie Eilish"), labels =c("Justin Bieber", "Taylor Swift", "Billie Eilish"))
 
-res.aov <- aov(score ~ Candidate, data=semFrame, na.action=na.exclude)
+semFrame$CandidateF <-factor(semFrame$Candidate, 
+                             levels=c("Justin Bieber", "Taylor Swift", "Billie Eilish"), 
+                             labels=c("Justin Bieber", "Taylor Swift", "Billie Eilish"))
+
+m0 = lm(score ~ 1, data=semFrame)
+m1 = lm(score ~ CandidateF, data=semFrame)
+models = list(m0,m1)
+model.names = c("Model 0", "Model 1")
 ```
+
+```{r fig.cap="WAIC scores for the null model and the model with celebrity added as predictor."}
+pander(aictab(cand.set=models, modnames=model.names))
+```
+
 ``` {r fig.cap="Effect pre-post measuring condition on the tweet sentiments of the three celebrities."}
-pander(res.aov)
+pander(anova(m0, m1))
 ```
+
 
 #### Post Hoc analysis
 <!-- If a model that includes the celebrity is better in explaining the sentiments of tweets than a model without such predictor, conduct a post-hoc analysis with e.g. Bonferroni correction, to examine which of celebrity tweets differ from the other celebrity tweets. Provide interpretation of the results -->
-Performing Post Hoc analysis allows us to determine whether there is a significant difference in tweet sentiments between all three celebrities, and how the distribution changes between them. The results, obtained by performing Tukey's Honest Significant Difference test, show that there is a significant difference in tweet sentiments for all three celebrities. Tweets about Taylor Swifts are the most positive, while those about Billie Eilish's are most negative, confirming our findings in the visual inspection.
+Performing Post Hoc analysis allows us to determine whether there is a significant difference in tweet sentiments between all three celebrities, and how the distribution changes between them. The results, obtained by performing Tukey's Honest Significant Difference test, show that there is a significant difference in tweet sentiments for all three celebrities. Tweets about Justin Bieber ($M=0.89,SD=0.69$) are the most positive, while those about Billie Eilish ($M=0.28, SD=0.63$) are most negative, confirming our findings in the visual inspection. Taylor Swift's ($M=0.66, SD=0.67$) are a bit less positive than Justin Bieber's.
 
 ```{r, message=FALSE, warning=FALSE, echo = T, results = 'hide', cache=TRUE}
 library(stats)
+mean(semFrame[semFrame$CandidateF=="Justin Bieber", "score"])
+sd(semFrame[semFrame$CandidateF=="Justin Bieber", "score"])
+mean(semFrame[semFrame$CandidateF=="Taylor Swift", "score"])
+sd(semFrame[semFrame$CandidateF=="Taylor Swift", "score"])
+mean(semFrame[semFrame$CandidateF=="Billie Eilish", "score"])
+sd(semFrame[semFrame$CandidateF=="Billie Eilish", "score"])
+res.aov <- aov(score~CandidateF, data = semFrame, na.action = na.exclude)
 ```
+
 ```{r, fig.cap="Results of performing Tukey's HSD."}
 TukeyHSD(res.aov)
 ```
 
 #### Report section for a scientific publication
 <!-- Write a small section for a scientific publication, in which you report the results of the analyses, and explain the conclusions that can be drawn. -->
-In order to determine whether sentiment of tweets depend on the celebrity they are about, a null model and a model with celebrity added as a independent variable predictor have been constructed. Results showed that the fit was significantly better ($F(2, 897) = 44.39$, p. < 0.01) with the added predictor. We can therefore conclude that the Twitter user base tweets differently depending on the three celebrities in the data set. Further analysis using Post Hoc analysis using Tukey's Honest Significant Difference test showed that there is a significant difference in tweet sentiment distribution in all three celebrity pairs, Taylor Swift - Justin Bieber (p. < 0.01), and Billie Eilish - Justin Bieber (p. < 0.01), and Taylor Swift - Billie Eilish (p. < 0.01).
+In order to determine whether sentiment of tweets depend on the celebrity they are about, a null model and a model with celebrity added as a independent variable predictor have been constructed. Results showed that the fit was significantly better ($F(2, 897) = 44.39$, p. < 0.01) when the null model ($AIC=1942$) had celebrity added as predictor ($AIC=1827$). We can therefore conclude that the Twitter user base tweets differently about Justin Bieber ($M=0.89,SD=0.69$), Taylor Swift ($M=0.66, SD=0.67$), and Billie Eilish ($M=0.28, SD=0.63$). Further analysis using Post Hoc analysis using Tukey's Honest Significant Difference test showed that there is a significant difference in tweet sentiment distribution in all three celebrity pairs, Taylor Swift - Justin Bieber (p. < 0.01), Billie Eilish - Justin Bieber (p. < 0.01), and Taylor Swift - Billie Eilish (p. < 0.01).
 
 ### Bayesian Approach
 
 #### Model description
 
 <!-- Describe the mathematical model fitted on the most extensive model. (hint, look at the mark down file of the lectures to see example on formulate mathematical models in markdown). Justify the priors. -->
-The most complex model tested uses the celebrity as an independent variable to predict the score. As we can expect the tweet sentiments to be normally distributed around 0 with almost all data between -5 and 5 due to the tweet word limit, a normally distributed prior with $\mu=0$ and $\sigma =2$ is used for $\mu$, and we allow $\sigma$ to take a value between 0.0001 and 5. When adding celebrity as an independent variable predictor, $a$ becomes a vector of parameters for each celebrity, giving us the following model where $N$ and $U$ represent a normal and uniform distribution respectively,
+The most complex model tested uses the celebrity as an independent variable to predict the score. As we can expect the tweet sentiments to be normally distributed around 0 with almost all data between -5 and 5 due to the tweet word limit, a normally distributed prior with $\mu=0$ and $\sigma =2$ is used for $\mu$, and we allow $\sigma$ to take a value between 0.0001 and 5. To investigate the influence of Celebrity we add it as a factor and transform the intercept parameter into an index variable, giving us the following model:
 
-$$\mu_{\text{celebrity}} = N(a_{\text{celebrity}}, \sigma) \\ a \sim N(0, 2) \\ \sigma \sim U(0.0001, 5)$$
-
-```{r, message=FALSE, warning=FALSE, echo = T, results = 'hide', cache=TRUE}
-semFrame <- subset(semFrame, select = c(score, CandidateF)) 
-x <- seq(-5, 5, length=100)
-y <- dnorm(x, mean=0, sd=2)
-```
-
-```{r, fig.cap="Sentiment values of all tweets."}
-hist(semFrame$score)
-```
-
-```{r, fig.cap="Normal distribution with a mean of 0 and a standard deviation of 2."}
-plot(x, y, type="l", lwd=1)
-```
+$$
+\begin{aligned}
+score &\sim Normal(\mu, \sigma) \\
+\mu &= a_{Candidate} \\
+a_{Candidate} &\sim Norm(0, 2) \\
+\sigma &\sim Uniform(0.001, 5) \\
+\end{aligned}
+$$
 
 #### Model comparison
-
 <!-- Conduct model analysis and provide brief interpretation of the results -->
-Analysing the parameters $a_1, a_2,$ and $a_3$, we can conclude that the means of the distributions of tweet sentiments vary significantly between each of the three celebrities. Furthermore, comparing the null model with the model using celebrity as a independent variable predictor, we can see that the latter model has a lower WAIC and thus a better fit, indicating that using celebrity as a predictor improves the fit of the model.
+The figure below depicts the difference in WAIC score between the null model ($m_0$, $WAIC=1943$) and the null model with Celebrity added as a factor ($m_1$, $WAIC=1829$). It is clear that the fit is better when the Celebrity factor is added, as the WAIC score is lower. Looking at the next figure we can see the credibility intervals for the vector parameters for the mean of model $m_1$. It is clear that the means of all three celebrities are different from one another, indicating that people tweet differently about the different celebrities.
+
 
 ```{r, message=FALSE, warning=FALSE, echo = T, results = 'hide', cache=TRUE}
-# ```{r STAN CHUNK}
-#include your code and output in the document
 library("rstan")
 library("rethinking")
 
@@ -326,18 +348,18 @@ m1 <-ulam(
 
 ```
 
-```{r fig.cap="Confidence intervals for the parameters of the model with celebrity added as a predictor."}
-plot(precis(m1, depth=2, prob = .95))
+```{r bayes_celeb_waic, fig.cap="Comparison of the WAIC score for each model."}
+plot(compare(m0, m1))
 ```
 
-```{r fig.cap="Comparison of the WAIC score for each model."}
-plot(compare(m0, m1, func=WAIC))
+```{r bayes_celeb_params, fig.cap="Confidence intervals for the parameters of the model with celebrity added as a predictor."}
+plot(precis(m1, depth=2, prob = .95))
 ```
 
 #### Comparison celebrity pair
 
 <!-- Compare sentiments of celebrity pairs and provide a brief interpretation (e.g. CIs)  -->
-Using `_bayes.t.test_` we can analyse the difference in tweet sentiment distributions for each celebrity pair. From the plots we can deduce that indeed there is a significant ($p < 0.01$) probability that the true distributions of the tweet sentiments for the three celebrities are different from one another.
+Using `_bayes.t.test_` we can analyse the difference in tweet sentiment distributions for each celebrity pair. From the plots we can deduce that for all three celebrity pairs there is a difference between the means, Justin Bieber ($Mean=0.9$), Taylor Swift ($Mean=0.66$), and Billie Eilish ($Mean=0$). Furthermore, the credibility intervals for the effect size do not contain 0 for all celebrity pairs, indicating that knowing the celebrity gives information about the tweet sentiment distribution and thus the fit of a model is better if Celebrity is used as a predictor.
 
 ```{r, message=FALSE, warning=FALSE, echo = T, results = 'hide'}
 # Might have to do 'brew install jags' on Mac to make this work.
@@ -777,5 +799,6 @@ Below we examine the estimate of parameters of the model with best fit, which is
 ```{r, fig.cap="Parameters of m2."}
 plot(m2)
 ```
+
 
 
