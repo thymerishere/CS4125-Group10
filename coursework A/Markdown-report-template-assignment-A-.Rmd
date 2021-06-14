@@ -308,10 +308,10 @@ library("rethinking")
 
 m0 <-ulam(
   alist(
-    score ~ dnorm(mu, sigma), 
+    score ~ dnorm(mu, sigma),
     mu <- a,
     a ~ dnorm(0, 2),
-    sigma ~ dunif(0.0001, 5)),  
+    sigma ~ dunif(0.0001, 5)),
   data =  semFrame ,iter = 10000, chains = 4, cores = 4, control=list(adapt_delta=.99), log_lik=TRUE
 )
 
@@ -385,7 +385,7 @@ web_visit$portal <- factor(x=web_visit$portal, labels=c("consumers", "companies"
 
 
 
-```{r, warning=FALSE, message=FALSE, out.width=40%, fig.cap="Histogram showing page visits on the website over all factors."}
+```{r, warning=FALSE, message=FALSE, out.width="40%", fig.cap="Histogram showing page visits on the website over all factors."}
 p <- web_visit %>% ggplot(aes(x=pages)) + geom_histogram(bins=10)
 plot(p)
 ```
@@ -481,7 +481,7 @@ The analysis shows that the final model had the best goodness of fit and, in fac
 As we have previously found a two-way interaction effect between the version and portal factors of the experiment, we will conduct a Simple Effect analysis to explore this interaction effect. 
 
 The following bar plot shows how the page visits vary over the factors.
-```{r, warning=FALSE, message=FALSE, out.width=50%, fig.cap="Bar plot showing the mean page visits per independent variable."}
+```{r, warning=FALSE, message=FALSE, out.width="50%", fig.cap="Bar plot showing the mean page visits per independent variable."}
 bar <- ggplot(web_visit, aes(portal , pages, fill = version))
 bar + stat_summary(fun.y = mean, geom = "bar", position="dodge")
 
@@ -525,13 +525,17 @@ A Poisson general linear model was fitted on the amount of page visits for users
 
 Our most extensive Bayesian model captures each individual factor as well as the interaction of the factors and is defined as follows:
 
-$$\text{PageVisits} \sim \text{Poisson}(\lambda) \\
-\lambda = a + b \cdot \text{Version} + c \cdot \text{Portal} + d\cdot \text{Version} \cdot \text{Portal} \\
-a \sim N(1.5, 2) \\ 
-b \sim N(0, 1) \\
-c \sim N(0, 1) \\ 
-d \sim N(0, 1) \\
-\sigma \sim U(0.1, 2)$$
+$$
+\begin{aligned}
+  \text{PageVisits} & \sim \text{Poisson}(\lambda) \\
+  \lambda & = a + b \cdot \text{Version} + c \cdot \text{Portal} + d\cdot \text{Version} \cdot \text{Portal} \\
+  a & \sim N(1.5, 2) \\ 
+  b & \sim N(0, 1) \\
+  c & \sim N(0, 1) \\ 
+  d  & \sim N(0, 1) \\
+  \sigma & \sim U(0.1, 2)
+\end{aligned}
+$$
 
 
 Here the functions $\text{Poisson}}$, $N$ and $U$ denote the probability functions of the Poisson, Normal and Uniform distributions respectively. 
@@ -551,6 +555,8 @@ plot(p)
 Besides the previously defined model, we defined simpler models which capture the effects of the factors on their own and their joint as well as interaction effect.  
 
 ```{r, warning=FALSE, message=FALSE, results = 'hide', echo=T, cache=TRUE}
+library("rstan")
+library("rethinking")
 web_visit <- subset(web_visit, select = c(pages,version, portal )) 
 web_visit$versionN <- as.numeric(web_visit$version)
 web_visit$portalN <- as.numeric(web_visit$portal)
@@ -599,7 +605,7 @@ m4 <-map2stan( alist(
 
 The figure below demonstrates the differences in WAIC between varying models. Here, `m0` is a model with just the prior, `m1` is a model capturing the effect of the website version, `m2` captures the effect of the portal, `m3` captures the effects of both the version and the portal and `m4` represents the model described earlier.
 
-```{r, warning=FALSE, message=FALSE, out.width=75%, fig.cap="WAIC comparison between Bayesian models capturing effects of different variables."}
+```{r, warning=FALSE, message=FALSE, out.width="75%", fig.cap="WAIC comparison between Bayesian models capturing effects of different variables."}
 plot(compare(m0,m1,m2,m3,m4, func=WAIC))
 ```
 
@@ -722,7 +728,7 @@ exp_data_1 = exp_data_1[exp_data_1$Subject < 100,]
 exp_data_1$Subject <- exp_data_1$Subject + 1
 
 m0 <-ulam( alist(
-    score ~ dnorm(mu, sigma), 
+    score ~ dnorm(mu, sigma),
     mu <- a ,
     a ~ dnorm(0, 100),
     sigma ~ dcauchy(0, 50)
@@ -730,24 +736,24 @@ m0 <-ulam( alist(
 )
 
 m1 <-ulam( alist(
-    score ~ dnorm(mu, sigma), 
+    score ~ dnorm(mu, sigma),
     mu <- a + a_Subject[Subject] ,
-    
+
     a_Subject[Subject] ~ dnorm(0, sigma_Subject),
     sigma_Subject ~ dcauchy(0, 100),
-    
+
     a ~ dnorm(0, 100),
     sigma ~ dcauchy(0, 50)
   ),  data = exp_data_1, iter = 10000, chains = 4, cores = 4, control=list(adapt_delta=.99), log_lik=TRUE
 )
 
 m2 <-ulam( alist(
-    score ~ dnorm(mu, sigma), 
+    score ~ dnorm(mu, sigma),
     mu <- a + a_Subject[Subject] + b * session,
-    
+
     a_Subject[Subject] ~ dnorm(0, sigma_Subject),
     sigma_Subject ~ dcauchy(0, 100),
-    
+
     a ~ dnorm(0, 100),
     b ~ dnorm(0, 5),
     sigma ~ dcauchy(0, 50)
