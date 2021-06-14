@@ -42,7 +42,7 @@ Our research question is the following: "How is students' understanding of lectu
 <!-- *Moderating variable (at least 1) -->
 
 
-```{r, echo=FALSE, out.width="75%", fig.cap="The conceptual model underlying the research."}
+```{r, echo=FALSE, fig.align='center', out.width="75%", fig.cap="The conceptual model underlying the research."}
 knitr::include_graphics("Conceptual_Model_A_1.2.png")
 ```
 
@@ -388,7 +388,7 @@ plot(bayes.t.test(tsSub$score, beSub$score))
 ### Conceptual model
 
 
-```{r, echo=FALSE, out.width="50%", fig.cap="The conceptual model underlying the research."}
+```{r, echo=FALSE, fig.align='center', out.width="50%", fig.cap="The conceptual model underlying the research."}
 knitr::include_graphics("ConceptualModel_2.2.png")
 ```
 
@@ -407,7 +407,7 @@ web_visit$portal <- factor(x=web_visit$portal, labels=c("consumers", "companies"
 
 
 
-```{r, warning=FALSE, message=FALSE, out.width="40%", fig.cap="Histogram showing page visits on the website over all factors."}
+```{r, warning=FALSE, message=FALSE, fig.align='center', out.width="40%", fig.cap="Histogram showing page visits on the website over all factors."}
 p <- web_visit %>% ggplot(aes(x=pages)) + geom_histogram(bins=10)
 plot(p)
 ```
@@ -503,7 +503,7 @@ The analysis shows that the final model had the best goodness of fit and, in fac
 As we have previously found a two-way interaction effect between the version and portal factors of the experiment, we will conduct a Simple Effect analysis to explore this interaction effect. 
 
 The following bar plot shows how the page visits vary over the factors.
-```{r, warning=FALSE, message=FALSE, out.width="50%", fig.cap="Bar plot showing the mean page visits per independent variable."}
+```{r, warning=FALSE, message=FALSE, fig.align='center', out.width="50%", fig.cap="Bar plot showing the mean page visits per independent variable."}
 bar <- ggplot(web_visit, aes(portal , pages, fill = version))
 bar + stat_summary(fun.y = mean, geom = "bar", position="dodge")
 
@@ -560,11 +560,11 @@ $$
 $$
 
 
-Here the functions $\text{Poisson}}$, $N$ and $U$ denote the probability functions of the Poisson, Normal and Uniform distributions respectively. 
+Here the functions $\text{Poisson}$, $N$ and $U$ denote the probability functions of the Poisson, Normal and Uniform distributions respectively. 
 
 The Poisson distribution was chosen as a prior as previous plots of the page visits shows the distribution to follow a Poisson distribution. By means of visual inspection the parameter $\lambda=1.5$  was chosen. See the figure below for a fit of the distribution to the data with these parameters.
 
-```{r, warning=FALSE, message=FALSE, fig.cap="Poisson distribution (lambda = 1.5) fitted to data of page visits"}
+```{r, warning=FALSE, message=FALSE, fig.align='center', out.width="50%", fig.cap="Poisson distribution (lambda = 1.5) fitted to data of page visits"}
 p <- web_visit %>% 
   ggplot( aes(x=pages)) + 
   geom_histogram(aes(y =..density..), bins=15) + 
@@ -627,7 +627,7 @@ m4 <-map2stan( alist(
 
 The figure below demonstrates the differences in WAIC between varying models. Here, `m0` is a model with just the prior, `m1` is a model capturing the effect of the website version, `m2` captures the effect of the portal, `m3` captures the effects of both the version and the portal and `m4` represents the model described earlier.
 
-```{r, warning=FALSE, message=FALSE, out.width="75%", fig.cap="WAIC comparison between Bayesian models capturing effects of different variables."}
+```{r, warning=FALSE, message=FALSE, fig.align='center', out.width="75%", fig.cap="WAIC comparison between Bayesian models capturing effects of different variables."}
 plot(compare(m0,m1,m2,m3,m4, func=WAIC))
 ```
 
