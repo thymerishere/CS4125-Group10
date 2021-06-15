@@ -110,14 +110,10 @@ download_tweets = FALSE
 ```
 
 ```{r, include=FALSE}
-
 #during writing you could add "eval = FALSE",  kntr will than not run this code chunk (take some time do)
-
 #source("working_dir.R")
 #setwd(wd) 
 # apple , note use / instead of \, which used by windows
-
-
 #install.packages("twitteR", dependencies = TRUE)
 library(twitteR)
 #install.packages("RCurl", dependencies = T)
@@ -138,14 +134,11 @@ library(RColorBrewer)
 library(wordcloud)
 #install.packages("reshape", dependencies=T)
 library(reshape)
-
 ################### functions
-
   
 clearTweets <- function(tweets, excl) {
   
   tweets.text <- sapply(tweets, function(t)t$getText()) #get text out of tweets 
-
   
   tweets.text = gsub('[[:cntrl:]]', '', tweets.text)
   tweets.text = gsub('\\d+', '', tweets.text)
@@ -161,13 +154,10 @@ clearTweets <- function(tweets, excl) {
   corpus_clean <- tm_map(corpus_clean, stripWhitespace)
   corpus_clean <- tm_map(corpus_clean, removeWords, c(excl,"http","https","httpst"))
   
-
   return(corpus_clean)
 } 
-
 if (download_tweets) {
   ## capture all the output to a file.
-
   ################# Collect from Twitter
   
   # for creating a twitter app (apps.twitter.com) see youtube https://youtu.be/lT4Kosc_ers
@@ -213,7 +203,6 @@ if (download_tweets) {
   semFrame$Candidate <-factor(semFrame$Candidate, labels=c("Justin Bieber", "Taylor Swift", "Billie Eilish"))
   write.csv(semFrame, "semFrame.csv", row.names = FALSE)
 } 
-
 if (!download_tweets) {
   semFrame = read.csv("semFrame.csv", stringsAsFactors = TRUE)
 }
@@ -224,7 +213,6 @@ if (!download_tweets) {
 From the boxplot containing the distribution of tweet sentiments for all three celebrities we can conclude that there is a visible difference in sentiment variance. Performing Levene's test verifies this. In the results of that test we can see that the effect is significant ($p<0.05$). This indicates that there is variance inequality between all three groups of tweets.
 
 ```{r, message=FALSE, warning=FALSE, echo = T, results = 'hide'}
-
 library(car)
 library(pander)
 ```
@@ -241,7 +229,6 @@ Analysing the bar graph of sentiment counts for all tweets for each celebrity, w
 
 ```{r, message=FALSE, warning=FALSE, echo = T, results = 'hide', cache=TRUE}
 library(ggplot2)
-
 p <- semFrame %>% ggplot( aes(x=score)) + geom_histogram( color="#e9ecef", alpha=0.6, position = 'identity') + facet_grid(. ~ Candidate)
 ```
 ```{r, fig.cap="Bar plot for the tweet sentiment values for each celebrity."}
@@ -259,12 +246,9 @@ library(pander)
 library(multcomp)
 library(stats)
 library(AICcmodavg)
-
-
 semFrame$CandidateF <-factor(semFrame$Candidate, 
                              levels=c("Justin Bieber", "Taylor Swift", "Billie Eilish"), 
                              labels=c("Justin Bieber", "Taylor Swift", "Billie Eilish"))
-
 m0 = lm(score ~ 1, data=semFrame)
 m1 = lm(score ~ CandidateF, data=semFrame)
 models = list(m0,m1)
@@ -327,7 +311,6 @@ The figure below depicts the difference in WAIC score between the null model ($m
 ```{r, message=FALSE, warning=FALSE, echo = T, results = 'hide', cache=TRUE}
 library("rstan")
 library("rethinking")
-
 m0 <-ulam(
   alist(
     score ~ dnorm(mu, sigma),
@@ -336,7 +319,6 @@ m0 <-ulam(
     sigma ~ dunif(0.0001, 5)),
   data =  semFrame ,iter = 10000, chains = 4, cores = 4, control=list(adapt_delta=.99), log_lik=TRUE
 )
-
 m1 <-ulam(
  alist(
    score ~ dnorm(mu, sigma),
@@ -345,7 +327,6 @@ m1 <-ulam(
    a[CandidateF] ~ dnorm(0, 2)),
  data =  semFrame ,iter = 10000, chains = 4, cores = 4, control=list(adapt_delta=.99), log_lik=TRUE
 )
-
 ```
 
 ```{r bayes_celeb_waic, fig.cap="Comparison of the WAIC score for each model."}
@@ -444,7 +425,6 @@ p <- web_visit %>% ggplot(aes(x=pages)) +
   geom_histogram(aes(y=..density..), bins=10, colour = "white", fill="grey75") + 
   facet_wrap(portal~version, scales = "free") +
   geom_density(aes(y=..density..), colour="blue") 
-
 plot(p)
 ```
 
@@ -459,7 +439,6 @@ First we perform Levene's Test to determine the homogeneity of variance.
 ```{r, warning=FALSE}
 library(car)
 library(pander)
-
 pander(leveneTest(web_visit$pages, interaction(web_visit$version , web_visit$portal)))
 ```
 
@@ -506,7 +485,6 @@ The following bar plot shows how the page visits vary over the factors.
 ```{r, warning=FALSE, message=FALSE, fig.align='center', out.width="50%", fig.cap="Bar plot showing the mean page visits per independent variable."}
 bar <- ggplot(web_visit, aes(portal , pages, fill = version))
 bar + stat_summary(fun.y = mean, geom = "bar", position="dodge")
-
 ```
 
 The plot clearly shows that there is a greater difference between the old and new versions of the website for the company portal. The Simple effect analysis will be conducted through a linear model fitted to contrasts on the consumer and company variables.
@@ -514,11 +492,8 @@ The plot clearly shows that there is a greater difference between the old and ne
 ```{r, warning=FALSE, message=FALSE}
 web_visit$simple <- interaction(web_visit$version, web_visit$portal)
 levels(web_visit$simple)
-
 contrastConsumers <-c(1,-1,0,0) #Only the consumer portal data 
 contrastCompanies <-c(0,0,1,-1) #Only the company portal data
-
-
 SimpleEff <- cbind(contrastConsumers,contrastCompanies)
 contrasts(web_visit$simple) <- SimpleEff 
 ```
@@ -582,24 +557,18 @@ library("rethinking")
 web_visit <- subset(web_visit, select = c(pages,version, portal )) 
 web_visit$versionN <- as.numeric(web_visit$version)
 web_visit$portalN <- as.numeric(web_visit$portal)
-
-
 m0 <-map2stan( alist(
     pages ~ dpois(lam), 
     lam <- a,
     a ~ dnorm(1.5,3)),
   data = web_visit, iter = 1000, chains = 4, cores = 4
 )
-
-
-
 m1 <-map2stan( alist(
     pages ~ dpois(lambda), lambda <- a + b*versionN,
     a ~ dnorm(1.5,3),
     b ~ dnorm(0, 1)),
   data = web_visit,iter = 10000, chains = 4, cores = 4
 )
-
   
 m2 <-map2stan( alist(
     pages ~ dpois(lambda), lambda <- a + c*portalN ,
@@ -607,7 +576,6 @@ m2 <-map2stan( alist(
     c ~ dnorm(0, 1)), 
   data = web_visit,iter = 10000, chains = 4, cores = 4
 )
-
 m3 <-map2stan( alist(
     pages ~ dpois(lambda), lambda <- a + b*versionN + c*portalN ,
    a ~ dnorm(1.5,3),
@@ -615,7 +583,6 @@ m3 <-map2stan( alist(
   c ~ dnorm(0, 1)),  
   data = web_visit,iter = 10000, chains = 4, cores = 4
 )
-
 m4 <-map2stan( alist(
     pages ~ dpois(lambda), 
   lambda <- a + b*versionN + c*portalN + d*versionN*portalN, 
@@ -641,11 +608,22 @@ The WAIC analysis above indicates that the extensive model described at the begi
 
 # Part 3 - Multilevel model
 
+```{r}
+library(pander)
+library(car)
+library(ggplot2)
+library(dplyr)
+library(nlme)
+library(Rmisc)
+library(rethinking)
+```
+
 ## Visual inspection
 <!-- Use graphics to inspect the distribution of the score, and relationship between session and score -->
 For this exericse, we use `set1.csv`. Below we inspect the distribution of the score through a histogram of the score. 
 
 ```{r, fig.cap="Histogram of score"}
+
 exp_data = read.csv("set1.csv")
 p <- exp_data %>% ggplot( aes(x=score)) + geom_histogram(bins=15) + theme()
 plot(p)
@@ -661,8 +639,6 @@ plot(p)
 Lastly we inspect the same relationship through a plot showing the mean score and standard error over sessions.
 
 ```{r, fig.cap="Mean score and standard error over sessions."}
-library(Rmisc)
-
 tgc = summarySE(exp_data, measurevar="score", groupvars=c("session"))
 p <- tgc %>% ggplot(aes(x=session, y=score, alpha=N*2)) + 
     geom_errorbar(aes(ymin=score-se, ymax=score+se), width=.1) +
@@ -683,44 +659,41 @@ Conduct multilevel analysis and calculate 95% confidence intervals, determine:
 -->
 Below we conduct a multilevel analysis to determine if session has an impact on people's score and to determine if there is a significant variance between the participants in their score. 
 
-The first model, $m_0$, includes a fixed intercept (`~1`) and a random intercept, indicated by `random = 1|Subject`. This model will have a general intercept (the fixed effect intercept) and an intercept for each of the subjects. In the output we see the standard deviation between the random-effect terms, which is 46.53 for the intercept per clinic, and 35.26 for the residuals. The fixed intercept value is 116.81.
+From the plots created above we conclude that there is a relation between session and score. This relation seems to be linear for up to 40-45 sessions. We check the assumption of homoskedacity using Levene's test, which determines the homogeneity of variance.
 
+```{r, warning=FALSE}
+pander(leveneTest(exp_data$score, exp_data$session))
+```
+
+The $p$-value of Levene's Test in this case is smaller than 0.05, indicating that there is a significant effect. This indicates that there is variance inequality between the sessions. This can also be seem in the plot showing the mean score and standard error over sessions. This means that the assumption of homoskedacity does not hold. Therefore, the results of the linear models should be interpreted with caution.
+
+We start by comparing our two models. The first model, $m_0$, includes a fixed intercept (`~1`) and a random intercept, indicated by `random = 1|Subject`. This model will have a general intercept (the fixed effect intercept) and an intercept for each of the subjects. The second model $m_1$ includes the variable `session`. The table below shows the results of fitting these models on the data and comparing them using ANOVA.
 
 ```{r}
-library(nlme)
-
 model0 <- lme(score ~ 1 , random = ~1|Subject, data = exp_data, method="ML")
-summary(model0)
-```
-
-We also inspect the 95% confidence interval. We see that 0 is not included in the intervals, therefore the found effects seem to be significant. We conclude that there is significant variance between participants in their score.
-
-```{r}
-intervals(model0, 0.95)
-```
-
-The second model $m_1$ includes the variable `session`. The summary function shows an estimated fixed effect for session on the score of 0.37. With a p-value of 0.0 this fixed effect is significant.
-
-```{r}
 model1 <- lme(score ~ session , random = ~1|Subject, data = exp_data, method="ML")
+pander(anova(model0, model1), caption = "Model comparison.")
+```
+
+As can be seen from these results, $m_1$ has the lowest AIC and thus the best goodness of fit. This result is significant ($p = 0$). We now further explore $m_1$.
+
+The summary function shows an estimated fixed effect for session on the score of 0.37. With a $p$-value of 0.0 this fixed effect is significant.
+
+```{r}
 summary(model1)
 ```
 
-Inspecting the 95% confidence intervals, we can again confirm that the effects are significant, since the intervals do not include 0. We conclude that session has an impact on people's score.
+Inspecting the 95% confidence intervals, we can again confirm that the effects are significant, since the intervals do not include 0. The 95% confidence interval of the estimated fixed efffect for session is [0.313, 0.424]. We conclude that session has an impact on people's score.
 
 ```{r}
 intervals(model1, 0.95)
-```
-
-```{r}
-pander(anova(model0, model1), caption = "Model comparison.")
 ```
 
 ### Report section for a scientific publication
 <!--
 Write a small section for a scientific publication, in which you report the results of the analyses, and explain the conclusions that can be drawn.
 -->
-To investigate whether session has an impact on people's scores and wheter there is a significant variance between the participants in their score, multilevel analysis was performed. A model with a random intercept only and a model with a random intercept and fixed effects were created. There was a significant relationship between session and score, $M = 116.8139$ (95% CI 112.70, 120.93), $p = 0$. The relationship between score and session showed significant variance in intercepts across subjects, $SD = 46.51$ (95% CI 43.67, 49.54), $p = 0$. 
+To investigate whether session has an impact on people's scores and wheter there is a significant variance between the participants in their score, multilevel analysis was performed. A model with a random intercept only ($m_0$) and a model with a random intercept and fixed effects ($m_1$) were created. It was found that model $m_1$ showed the best goodness of fit, $p < 0.05$. There was a significant relationship between session and score, $M = 116.8139$ (95% CI 112.70, 120.93), $p = 0$. The relationship between score and session showed significant variance in intercepts across subjects, $SD = 46.51$ (95% CI 43.67, 49.54), $p = 0$. 
 
 ## Bayesian approach
 
@@ -730,21 +703,25 @@ Describe the mathematical model fitted on the most extensive model. (hint, look 
 -->
 In most extensive mathematical model, the score is drawn from a normal distribution with mean $\mu$ and standard deviation $\sigma$. Parameter $\mu$ is created through a linear equation involving parameters $a$ (an intercept), $a_\text{Subject}$ (a subject-specific intercept) and $b$ multiplied by $\text{session}$. 
 
-$\text{Score} \sim N(\mu, \sigma)$
-$\mu = a + a_\text{Subject}[Subject] + b * \text{session}$
-$a_\text{Subject}[Subject] \sim N(0, \sigma_\text{Subject})$
-$\sigma_\text{Subject} \sim \text{Cauchy}(0, 100)T(0, \infty)$
-$a \sim N(0, 100)$
-$b \sim N(0, 5)$
-$\sigma \sim \text{Cauchy}(0,50)T(0, \infty)$
+$$
+\begin{aligned}
+\text{Score} & \sim N(\mu, \sigma) \\
+\mu & = a + a_\text{Subject}[Subject] + b * \text{session} \\
+a_\text{Subject}[Subject] & \sim N(0, \sigma_\text{Subject}) \\
+\sigma_\text{Subject} & \sim \text{Cauchy}(0, 100)T(0, \infty) \\
+a & \sim N(0, 100) \\
+b & \sim N(0, 100) \\
+\sigma & \sim \text{Cauchy}(0,100)T(0, \infty)
+\end{aligned}
+$$
 
-For the prior of the standard deviations $\sigma_\text{Subject}$ and $\sigma$ we use a half Cauchy distribution. We use a Cauchy distribution with a large scale value, since we do not have much prior knowledge or belief about the true parameters. With this large scale, the half Cauchy distribution has, unlike the normal distribution, fat tails. This makes the distribution over values away from the mean more uniform than in a normal distribution. For parameters $a$, $a_\text{Subject}$ and $b$ we chose to use a normal distribution as prior.
+For the prior of the standard deviations $\sigma_\text{Subject}$ and $\sigma$ we use a half Cauchy distribution. We use a Cauchy distribution with a large scale value of 100 for both, since we do not have much prior knowledge or belief about the true parameters. With this large scale, the half Cauchy distribution has, unlike the normal distribution, fat tails. This makes the distribution over values away from the mean more uniform than in a normal distribution. For parameters $a$, $a_\text{Subject}$ and $b$ we chose to use a normal distribution as prior. We have no prior expectations on whether the intercepts $a$ and $a_\text{Subject}$ are positive or negative, therefore we choose a mean of 0 for both. For intercept $a$ we choose a standard deviation of 100 to again show this uncertainty. For parameter $b$ we again choose a mean of 0 as we do not know whether session has a positive or negative relation with $\mu$. We choose a standard deviation of 100 to reflect this high uncertainty.
 
 ### Model comparison
 
 We select the first 100 participants from the data set. Then, we create three models with increasing complexity.
 
-```{r, message=FALSE, warning=FALSE, cache=TRUE}
+```{r, warning=FALSE, message=FALSE, results = 'hide', echo=T, cache=TRUE}
 exp_data_1 = data.frame(exp_data)
 exp_data_1 = exp_data_1[exp_data_1$Subject < 100,]
 exp_data_1$Subject <- exp_data_1$Subject + 1
@@ -753,7 +730,7 @@ m0 <-ulam( alist(
     score ~ dnorm(mu, sigma),
     mu <- a ,
     a ~ dnorm(0, 100),
-    sigma ~ dcauchy(0, 50)
+    sigma ~ dcauchy(0, 100)
   ),  data = exp_data_1, iter = 10000, chains = 4, cores = 4, control=list(adapt_delta=.99), log_lik=TRUE
 )
 
@@ -765,7 +742,7 @@ m1 <-ulam( alist(
     sigma_Subject ~ dcauchy(0, 100),
 
     a ~ dnorm(0, 100),
-    sigma ~ dcauchy(0, 50)
+    sigma ~ dcauchy(0, 100)
   ),  data = exp_data_1, iter = 10000, chains = 4, cores = 4, control=list(adapt_delta=.99), log_lik=TRUE
 )
 
@@ -777,8 +754,8 @@ m2 <-ulam( alist(
     sigma_Subject ~ dcauchy(0, 100),
 
     a ~ dnorm(0, 100),
-    b ~ dnorm(0, 5),
-    sigma ~ dcauchy(0, 50)
+    b ~ dnorm(0, 100),
+    sigma ~ dcauchy(0, 100)
   ),  data = exp_data_1, iter = 10000, chains = 4, cores = 4, control=list(adapt_delta=.99), log_lik=TRUE
 )
 
@@ -789,11 +766,23 @@ plot(compare(m0,m1,m2))
 ```
 
 
-From the plot we can see that models $m_1$ and $m_2$ outperform model $m_0$. However, there is not much of a difference between $m_1$ and $m_2$. The effective number of parameters ($pWAIC$) increases for both these models.
+From the plot we can see that models $m_1$ and $m_2$ outperform model $m_0$. However, there is not much of a difference in WAIC scores between $m_1$ and $m_2$. The effective number of parameters ($pWAIC$) increases for both these models. 
 
 ### Estimates examination
 
-Below we examine the estimate of parameters of the model with best fit, which is $m_2$. We see that the uncertainty for parameters $\sigma_\text{Subject}$ and $a$ is relatively high compared to that for parameters $b$ and $\sigma$. Since the value for $b$ is close to zero, it seems that session does not impact score.
+We further investigate the difference between $m_1$ and $m_2$ by looking at the parameters.
+
+```{r}
+pander(precis(m1))
+```
+
+```{r}
+pander(precis(m2))
+```
+
+As can be seen, the parameters of the two models are also quite similar. It seems that while $b$ does have some effect, it is not a large one.
+
+Below we visually examine the estimate of parameters of the model with best fit, which is $m_2$. We see that the uncertainty for parameters $\sigma_\text{Subject}$ and $a$ is relatively high compared to that for parameters $b$ and $\sigma$.
 
 
 ```{r, fig.cap="Parameters of m2."}
