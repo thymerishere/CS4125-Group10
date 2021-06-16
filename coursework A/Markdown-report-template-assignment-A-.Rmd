@@ -85,7 +85,7 @@ In the experiment, both participant groups will take a pre-test and a post-test.
 ## Participants
 <!-- Describe which participants will recruit in the study and how they will be recruited -->
 <!-- What to add? -->
-Participants should be students and could be recruited by asking for volunteers across a university campus. A small compensation could be offered in return as a sign of appreciation.
+Participants should be students and could be recruited by asking for volunteers on a university campus. In order to eliminate differences from different backgrounds, participants should be chosen from the same university programme (e.g. Computer Science or Mathematics). More participants is better, as this allows us to average out individual factors. Ideally, the live and online groups are about 300 participants each, both filling a lecture hall. There will be a variation in age, but because students are usually around the same age in a given univerisity program we can expect this variance to be small. A small compensation could be offered in return as a sign of appreciation.
 
 ## Suggested statistical analyses
 <!-- 
