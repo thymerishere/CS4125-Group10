@@ -1,0 +1,24 @@
+TSNE loss cosine Ovarian Cancer 0.50666
+TSNE loss spearman Ovarian Cancer 0.72017
+MDS stress cosine Ovarian Cancer 545.3372
+MDS lambda 1 cosine Ovarian Cancer 2.9567
+MDS lambda 2 cosine Ovarian Cancer 0.45359
+MDS stress spearman Ovarian Cancer 3139.783
+MDS lambda 1 spearman Ovarian Cancer 4.1105
+MDS lambda 2 spearman Ovarian Cancer 1.4189
+TSNE loss cosine Fisher Iris 0.2123
+TSNE loss spearman Fisher Iris 0.032792
+MDS stress cosine Fisher Iris 479.6306
+MDS lambda 1 cosine Fisher Iris 3.2121
+MDS lambda 2 cosine Fisher Iris 0.092075
+MDS stress spearman Fisher Iris 611.1456
+MDS lambda 1 spearman Fisher Iris 6.6667
+MDS lambda 2 spearman Fisher Iris 1.9586e-15
+TSNE loss cosine MNIST 0.93808
+TSNE loss spearman MNIST 0.87688
+MDS stress cosine MNIST 102049.1398
+MDS lambda 1 cosine MNIST 28.2414
+MDS lambda 2 cosine MNIST 23.6488
+MDS stress spearman MNIST 214839.006
+MDS lambda 1 spearman MNIST 39.3256
+MDS lambda 2 spearman MNIST 34.7507
