@@ -103,6 +103,7 @@ First, we determine our null hypothesis $H_0$ and alternative hypothesis $H_1$. 
 
 ### Collecting tweets, and data preparation
 <!-- Include the annotated R script (excluding your personal Keys and Access Tokens information), but put echo=FALSE, so code is not included in the output pdf file. -->
+The data used in this research has been collected on May 20th, 2021.
 
 ```{r, include=FALSE}
 # Enable this for tweet downloading. If set to 'FALSE' semFrame.csv will be loaded.
@@ -210,13 +211,13 @@ if (!download_tweets) {
 
 ### Homogeneity of variance analysis
 <!-- Analyze the homogeneity of variance of sentiments of the tweets of the different celebrities, and provide interpretation -->
-From the boxplot containing the distribution of tweet sentiments for all three celebrities we can conclude that there is a visible difference in sentiment variance. Performing Levene's test verifies this. In the results of that test we can see that the effect is significant ($p<0.05$). This indicates that there is variance inequality between all three groups of tweets.
+From the boxplot containing the distribution of tweet sentiments for all three celebrities we can conclude that there is a visible difference in sentiment variance. Performing Levene's test verifies this. In the results of that test we can see that the effect is significant ($F_{2,897}=6.79,p<0.05$). This indicates that there is variance inequality between all three groups of tweets.
 
 ```{r, message=FALSE, warning=FALSE, echo = T, results = 'hide'}
 library(car)
 library(pander)
 ```
-```{r, fig.cap="Boxplot of the sentiment values of the tweets for each celebrity."}
+```{r, fig.cap="Boxplot of the sentiment values of the tweets for each celebrity.", fig.align='center', out.width='50%'}
 boxplot(semFrame$score ~ semFrame$Candidate)
 ```
 ```{r, fig.cap="Results of performing Levene's test on the three groups of tweets about the three celebrities."}
@@ -229,9 +230,11 @@ Analysing the bar graph of sentiment counts for all tweets for each celebrity, w
 
 ```{r, message=FALSE, warning=FALSE, echo = T, results = 'hide', cache=TRUE}
 library(ggplot2)
-p <- semFrame %>% ggplot( aes(x=score)) + geom_histogram( color="#e9ecef", alpha=0.6, position = 'identity') + facet_grid(. ~ Candidate)
+p <- semFrame %>% ggplot( aes(x=score)) 
+  + geom_histogram( color="#e9ecef", alpha=0.6, position = 'identity') 
+  + facet_grid(. ~ Candidate)
 ```
-```{r, fig.cap="Bar plot for the tweet sentiment values for each celebrity."}
+```{r, fig.cap="Bar plot for the tweet sentiment values for each celebrity.", fig.align='center', out.width='50%'}
 plot(p)
 ```
 
@@ -305,7 +308,7 @@ $$
 
 #### Model comparison
 <!-- Conduct model analysis and provide brief interpretation of the results -->
-The figure below depicts the difference in WAIC score between the null model ($m_0$, $WAIC=1943$) and the null model with Celebrity added as a factor ($m_1$, $WAIC=1829$). It is clear that the fit is better when the Celebrity factor is added, as the WAIC score is lower. Looking at the next figure we can see the credibility intervals for the vector parameters for the mean of model $m_1$. It is clear that the means of all three celebrities are different from one another, indicating that people tweet differently about the different celebrities.
+The figure below depicts the difference in WAIC score between the null model ($m_0$, $WAIC=1943$) and the null model with Celebrity added as a factor ($m_1$, $WAIC=1829$). It is clear that the fit is better when the Celebrity factor is added, as the WAIC score is lower. Looking at the next figure we can see the credibility intervals for the vector parameters ($a[1]$, $a[2]$, and $a[3]$) for the mean of model $m_1$. It is clear that the means of all three celebrities are different from one another in the model, indicating that people tweet differently about the different celebrities.
 
 
 ```{r, message=FALSE, warning=FALSE, echo = T, results = 'hide', cache=TRUE}
@@ -317,7 +320,8 @@ m0 <-ulam(
     mu <- a,
     a ~ dnorm(0, 2),
     sigma ~ dunif(0.0001, 5)),
-  data =  semFrame ,iter = 10000, chains = 4, cores = 4, control=list(adapt_delta=.99), log_lik=TRUE
+  data =semFrame ,iter = 10000, chains = 4, 
+    cores = 4, control=list(adapt_delta=.99), log_lik=TRUE
 )
 m1 <-ulam(
  alist(
@@ -325,15 +329,16 @@ m1 <-ulam(
    mu <- a[CandidateF] ,
    sigma ~  dunif(0.0001, 5),
    a[CandidateF] ~ dnorm(0, 2)),
- data =  semFrame ,iter = 10000, chains = 4, cores = 4, control=list(adapt_delta=.99), log_lik=TRUE
+ data = semFrame ,iter = 10000, chains = 4, 
+  cores = 4, control=list(adapt_delta=.99), log_lik=TRUE
 )
 ```
 
-```{r bayes_celeb_waic, fig.cap="Comparison of the WAIC score for each model."}
+```{r bayes_celeb_waic, fig.cap="Comparison of the WAIC score for each model.", fig.align='center', out.width='50%'}
 plot(compare(m0, m1))
 ```
 
-```{r bayes_celeb_params, fig.cap="Confidence intervals for the parameters of the model with celebrity added as a predictor."}
+```{r bayes_celeb_params, fig.cap="Confidence intervals for the parameters of the model with celebrity added as a predictor.", fig.align='center', out.width='50%'}
 plot(precis(m1, depth=2, prob = .95))
 ```
 
@@ -369,7 +374,7 @@ plot(bayes.t.test(tsSub$score, beSub$score))
 ### Conceptual model
 
 
-```{r, echo=FALSE, fig.align='center', out.width="50%", fig.cap="The conceptual model underlying the research."}
+```{r, echo=FALSE, fig.align='center', out.width="50%", fig.cap="The conceptual for the research question about modeling the amount of page visits."}
 knitr::include_graphics("ConceptualModel_2.2.png")
 ```
 
@@ -395,7 +400,7 @@ plot(p)
 
 To determine whether either of the IV's have an effect on the distribution of the page visits we observe the distributions under different instantiations of the IV's in the following figure:
 
-```{r, warning=FALSE, message=FALSE, fig.cap="Histograms of page visits on the website per independent variable."}
+```{r, warning=FALSE, message=FALSE, fig.cap="Histograms of page visits on the website per independent variable.", fig.align='center', out.width='50%'}
 p <- web_visit %>% ggplot( aes(x=pages)) + geom_histogram(bins=10) + facet_grid(portal ~ version)
 plot(p)
 ```
@@ -409,7 +414,7 @@ pander(summarise(grouped, mean=mean(pages), sd=sd(pages)), caption = "Summary st
 
 To further assist our understanding of the distribution we will also draw boxplots of the same data to observe differences in the distribution:
 
-```{r, warning=FALSE, message=FALSE, fig.cap="Boxplots of page visits on the website per independent variable"}
+```{r, warning=FALSE, message=FALSE, fig.cap="Boxplots of page visits on the website per independent variable", fig.align='center', out.width='50%'}
 p <- web_visit %>% ggplot( aes(y=pages)) + geom_boxplot() + facet_grid(portal ~ version, scales = "free_x", space = "free_x") + theme( axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank())
 plot(p)
 ```
@@ -420,7 +425,7 @@ Based on the figures it seems that the IV's do affect the distribution of the DV
 
 Again, we take the histograms over all the IV's and plot a density on top of it to see if a normal distribution can be observed in the data.
 
-```{r, message=FALSE, warning=FALSE, fig.cap="Density plots fitted to data of page visits"}
+```{r, message=FALSE, warning=FALSE, fig.cap="Density plots fitted to data of page visits", fig.align='center', out.width='50%'}
 p <- web_visit %>% ggplot(aes(x=pages)) + 
   geom_histogram(aes(y=..density..), bins=10, colour = "white", fill="grey75") + 
   facet_wrap(portal~version, scales = "free") +
@@ -620,9 +625,9 @@ library(rethinking)
 
 ## Visual inspection
 <!-- Use graphics to inspect the distribution of the score, and relationship between session and score -->
-For this exericse, we use `set1.csv`. Below we inspect the distribution of the score through a histogram of the score. 
+For this exercise, we use `set1.csv`. Below we inspect the distribution of the score through a histogram of the score. 
 
-```{r, fig.cap="Histogram of score"}
+```{r, fig.cap="Histogram of score.", fig.align='center', out.width='50%'}
 
 exp_data = read.csv("set1.csv")
 p <- exp_data %>% ggplot( aes(x=score)) + geom_histogram(bins=15) + theme()
@@ -631,7 +636,7 @@ plot(p)
 
 We also inspect the relationship between session and score through a scatterplot.
 
-```{r, fig.cap="Scatterplot relation between score and session"}
+```{r, fig.cap="Scatterplot relation between score and session."}
 p <- exp_data %>% ggplot( aes(x=session, y=score)) + geom_point(alpha=0.25) + theme()
 plot(p)
 ```
@@ -761,7 +766,7 @@ m2 <-ulam( alist(
 
 compare(m0,m1,m2)
 ```
-```{r fig.cap="Comparing three Bayesian models of increasing complexity."}
+```{r fig.cap="Comparing three Bayesian models of increasing complexity.", fig.align='center', out.width='50%'}
 plot(compare(m0,m1,m2))
 ```
 
@@ -785,7 +790,7 @@ As can be seen, the parameters of the two models are also quite similar. It seem
 Below we visually examine the estimate of parameters of the model with best fit, which is $m_2$. We see that the uncertainty for parameters $\sigma_\text{Subject}$ and $a$ is relatively high compared to that for parameters $b$ and $\sigma$.
 
 
-```{r, fig.cap="Parameters of m2."}
+```{r, fig.cap="Parameters of m2.", fig.align='center', out.width='50%'}
 plot(m2)
 ```
 
