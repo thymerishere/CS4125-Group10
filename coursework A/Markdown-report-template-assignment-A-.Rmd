@@ -8,6 +8,9 @@ output:
     number_sections: yes
   word_document: default
 subtitle: CS4125 Seminar Research Methodology for Data Science
+header-includes:
+ \usepackage{float}
+ \floatplacement{figure}{H}
 ---
 
 ```{r setup, include=FALSE}
