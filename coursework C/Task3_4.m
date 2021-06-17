@@ -34,7 +34,7 @@ function calculate_and_plot(dataset, labels, datasetname)
     gscatter(Y1(:,1),Y1(:,2), labels)
     xlabel('Dimension 1');
     ylabel('Dimension 2');
-    saveas(gcf, "figures/task3_4/t-SNE cosine " + datasetname)
+    saveas(gcf, "figures/task3_4/t-SNE cosine " + datasetname + ".png")
     fprintf(fid, "TSNE loss cosine " + datasetname + " " + loss1 + "\n");
     
      % t-SNE
@@ -42,7 +42,7 @@ function calculate_and_plot(dataset, labels, datasetname)
     gscatter(Y1(:,1),Y1(:,2), labels)
     xlabel('Dimension 1');
     ylabel('Dimension 2');
-    saveas(gcf,'figures/task3_4/t-SNE spearman ' + datasetname);
+    saveas(gcf,'figures/task3_4/t-SNE spearman ' + datasetname + ".png");
     fprintf(fid, "TSNE loss spearman " + datasetname + " " + loss1 + "\n");
     
     % MDS cosine
@@ -52,7 +52,7 @@ function calculate_and_plot(dataset, labels, datasetname)
     gscatter(Y2(:,1),Y2(:,2), labels)
     xlabel('Dimension 1');
     ylabel('Dimension 2');
-    saveas(gcf, "figures/task3_4/MDS cosine " + datasetname);
+    saveas(gcf, "figures/task3_4/MDS cosine " + datasetname + ".png");
     fprintf(fid, "MDS stress cosine " + datasetname + " " + sum(stress(:)) + "\n");
     fprintf(fid, "MDS lambda 1 cosine " + datasetname + " " + lambda_p(1,1) + "\n");
     fprintf(fid, "MDS lambda 2 cosine " + datasetname + " " + lambda_p(2,2) + "\n");
@@ -64,7 +64,7 @@ function calculate_and_plot(dataset, labels, datasetname)
     gscatter(Y2(:,1),Y2(:,2), labels);
     xlabel('Dimension 1');
     ylabel('Dimension 2');
-    saveas(gcf, "figures/task3_4/MDS spearman "  + datasetname);
+    saveas(gcf, "figures/task3_4/MDS spearman "  + datasetname + ".png");
     fprintf(fid, "MDS stress spearman " + datasetname + " " + sum(stress(:)) + "\n");
     fprintf(fid, "MDS lambda 1 spearman " + datasetname + " " + lambda_p(1,1) + "\n");
     fprintf(fid, "MDS lambda 2 spearman " + datasetname + " " + lambda_p(2,2) + "\n");
