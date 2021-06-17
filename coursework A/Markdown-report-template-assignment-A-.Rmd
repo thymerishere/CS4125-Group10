@@ -657,6 +657,8 @@ p <- tgc %>% ggplot(aes(x=session, y=score, alpha=N*2)) +
 plot(p)
 ```
 
+From the plots created above we conclude that there is a relation between session and score. This relation seems to be linear for up to 40-45 sessions.
+
 ## Frequentist approach
 
 ### Multilevel analysis
@@ -668,7 +670,7 @@ Conduct multilevel analysis and calculate 95% confidence intervals, determine:
 -->
 Below we conduct a multilevel analysis to determine if session has an impact on people's score and to determine if there is a significant variance between the participants in their score. 
 
-From the plots created above we conclude that there is a relation between session and score. This relation seems to be linear for up to 40-45 sessions. We check the assumption of homoskedacity using Levene's test, which determines the homogeneity of variance.
+We check the assumption of homoskedacity using Levene's test, which determines the homogeneity of variance.
 
 ```{r, warning=FALSE}
 pander(leveneTest(exp_data$score, exp_data$session))
@@ -702,7 +704,7 @@ intervals(model1, 0.95)
 <!--
 Write a small section for a scientific publication, in which you report the results of the analyses, and explain the conclusions that can be drawn.
 -->
-To investigate whether session has an impact on people's scores and wheter there is a significant variance between the participants in their score, multilevel analysis was performed. A model with a random intercept only ($m_0$) and a model with a random intercept and fixed effects ($m_1$) were created. It was found that model $m_1$ showed the best goodness of fit, $p < 0.05$. There was a significant relationship between session and score, $M = 116.8139$ (95% CI 112.70, 120.93), $p = 0$. The relationship between score and session showed significant variance in intercepts across subjects, $SD = 46.51$ (95% CI 43.67, 49.54), $p = 0$. 
+To investigate whether session has an impact on people's scores and wheter there is a significant variance between the participants in their score, multilevel analysis was performed. A model with a random intercept only ($m_0$) and a model with a random intercept and fixed effects ($m_1$) were created. It was found that model $m_1$ showed the best goodness of fit, $p < 0.05$. There was a significant relationship between session and score, $M = 116.8139$ (95% CI 112.70, 120.93), $p = 0$. 
 
 ## Bayesian approach
 
@@ -724,7 +726,7 @@ b & \sim N(0, 100) \\
 \end{aligned}
 $$
 
-For the prior of the standard deviations $\sigma_\text{Subject}$ and $\sigma$ we use a half Cauchy distribution. We use a Cauchy distribution with a large scale value of 100 for both, since we do not have much prior knowledge or belief about the true parameters. With this large scale, the half Cauchy distribution has, unlike the normal distribution, fat tails. This makes the distribution over values away from the mean more uniform than in a normal distribution. For parameters $a$, $a_\text{Subject}$ and $b$ we chose to use a normal distribution as prior. We have no prior expectations on whether the intercepts $a$ and $a_\text{Subject}$ are positive or negative, therefore we choose a mean of 0 for both. For intercept $a$ we choose a standard deviation of 100 to again show this uncertainty. For parameter $b$ we again choose a mean of 0 as we do not know whether session has a positive or negative relation with $\mu$. We choose a standard deviation of 100 to reflect this high uncertainty.
+For the prior of the standard deviations $\sigma_\text{Subject}$ and $\sigma$ we use a half Cauchy distribution. We use a half Cauchy distribution with a large scale value of 100 for both, since we do not have much prior knowledge or belief about the true parameters. We use a half cauchy distribution as the standard deviation cannot be negative. With this large scale, the half Cauchy distribution has, unlike the normal distribution, fat tails. This makes the distribution over values away from the mean more uniform than in a normal distribution. For parameters $a$, $a_\text{Subject}$ and $b$ we chose to use a normal distribution as prior. We have no prior expectations on whether the intercepts $a$ and $a_\text{Subject}$ are positive or negative, therefore we choose a mean of 0 for both. For intercept $a$ we choose a standard deviation of 100 to again show this uncertainty. For parameter $b$ we again choose a mean of 0 as we do not know whether session has a positive or negative relation with $\mu$. We choose a standard deviation of 100 to reflect this high uncertainty.
 
 ### Model comparison
 
