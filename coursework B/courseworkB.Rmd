@@ -57,20 +57,24 @@ ggplot(d, aes(x=trdcount, y=score)) + geom_boxplot(outlier.shape = NA) + geom_ji
 
 Data analysis
 
-Visualizing score distribution across TeDs.
-``` {r}
-p <- ggplot(dtask, aes(x=score, fill=TeD)) + geom_density(position = "stack", size=0.1) + facet_grid(~modeltype)
-ggsave("score_density.pdf", width=5, height=3)
-p
-```
+
 Visualizing score distribution across tasks.
 ``` {r}
 dtask <- data.frame(d)
+dtask$dtl <- factor(dtask$modeltype == "M" | dtask$modeltype == "S", labels = c("Non Transfer Learning", "Transfer Learning"))
 my_map <- c("TeD1"="Classification", "TeD2"="Classification", "TeD3"="Classification", "TeD4"="Classification", "TeD5"="Recommendation", "TeD6"="Regression", "TeD7"="Regression")
 dtask$task <- my_map[dtask$TeD]
-ggplot(dtask, aes(x=score, fill=task)) + geom_density(position = "stack", size=0.1) + facet_grid(~modeltype)
+ggplot(dtask, aes(x=score, fill=task)) + geom_density(position = "stack", size=0.1) + facet_grid(~dtl)
 ggsave("scores_task_density.pdf", width=6,height=3)
 ```
+
+Visualizing score distribution across TeDs.
+``` {r}
+p <- ggplot(dtask, aes(x=score, fill=TeD)) + geom_density(position = "stack", size=0.1) + facet_grid(~dtl)
+ggsave("score_density.pdf", width=5, height=3)
+p
+```
+
 Visualizing score distributions of only the transfer learning models across tasks.
 ``` {r}
 dtl <- d[which((d$modeltype == "M" | d$modeltype == "S") & d$model != "B1" & d$model != "B2" & d$TeD != "TeD5"), c("model", "TeD", "score")]
@@ -197,7 +201,7 @@ emmeans(model2, ~trdcount)
 ```{r}
 require(lme4)
 model3 <- glmer(score ~ trdcount + (1 | TeD), data=d)
-model2 <- glme(score ~ trdcount + (1 | TeD), data = d)
+model2 <- glmer(score ~ trdcount + (1 | TeD), data = d)
 pander(anova(model2, model3), caption = "Model comparison between model 2 and model 3")
 summary(model3)
 intervals(model3, 0.95)
