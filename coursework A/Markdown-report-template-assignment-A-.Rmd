@@ -12,6 +12,8 @@ subtitle: CS4125 Seminar Research Methodology for Data Science
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.pos = 'H')
+
 ```
 
 \tableofcontents
@@ -526,18 +528,17 @@ $$
 \begin{aligned}
   \text{PageVisits} & \sim \text{Poisson}(\lambda) \\
   \lambda & = a + b \cdot \text{Version} + c \cdot \text{Portal} + d\cdot \text{Version} \cdot \text{Portal} \\
-  a & \sim N(1.5, 2) \\ 
-  b & \sim N(0, 1) \\
-  c & \sim N(0, 1) \\ 
-  d  & \sim N(0, 1) \\
-  \sigma & \sim U(0.1, 2)
+  a & \sim N(1.5, 5) \\ 
+  b & \sim N(0, 5) \\
+  c & \sim N(0, 5) \\ 
+  d  & \sim N(0, 5) 
 \end{aligned}
 $$
 
 
 Here the functions $\text{Poisson}$, $N$ and $U$ denote the probability functions of the Poisson, Normal and Uniform distributions respectively. 
 
-The Poisson distribution was chosen as a prior as previous plots of the page visits shows the distribution to follow a Poisson distribution. By means of visual inspection the parameter $\lambda=1.5$  was chosen. See the figure below for a fit of the distribution to the data with these parameters.
+The Poisson distribution was chosen as a prior as previous plots of the page visits shows the distribution to follow a Poisson distribution. By means of visual inspection the parameter $\lambda=1.5$  was chosen. See the figure below for a fit of the distribution to the data with these parameters. The other parameters are fitted to a normal distribution around 0 with a standard deviation of 5 to reflect the uncertainty of the effects that the variables may have.
 
 ```{r, warning=FALSE, message=FALSE, fig.align='center', out.width="50%", fig.cap="Poisson distribution (lambda = 1.5) fitted to data of page visits"}
 p <- web_visit %>% 
@@ -560,34 +561,34 @@ web_visit$portalN <- as.numeric(web_visit$portal)
 m0 <-map2stan( alist(
     pages ~ dpois(lam), 
     lam <- a,
-    a ~ dnorm(1.5,3)),
+    a ~ dnorm(1.5,5)),
   data = web_visit, iter = 1000, chains = 4, cores = 4
 )
 m1 <-map2stan( alist(
     pages ~ dpois(lambda), lambda <- a + b*versionN,
-    a ~ dnorm(1.5,3),
-    b ~ dnorm(0, 1)),
+    a ~ dnorm(1.5,5),
+    b ~ dnorm(0, 5)),
   data = web_visit,iter = 10000, chains = 4, cores = 4
 )
   
 m2 <-map2stan( alist(
     pages ~ dpois(lambda), lambda <- a + c*portalN ,
-    a ~ dnorm(1.5,3),
-    c ~ dnorm(0, 1)), 
+    a ~ dnorm(1.5,5),
+    c ~ dnorm(0, 5)), 
   data = web_visit,iter = 10000, chains = 4, cores = 4
 )
 m3 <-map2stan( alist(
     pages ~ dpois(lambda), lambda <- a + b*versionN + c*portalN ,
-   a ~ dnorm(1.5,3),
-  b ~ dnorm(0, 1),
-  c ~ dnorm(0, 1)),  
+   a ~ dnorm(1.5,5),
+  b ~ dnorm(0, 5),
+  c ~ dnorm(0, 5)),  
   data = web_visit,iter = 10000, chains = 4, cores = 4
 )
 m4 <-map2stan( alist(
     pages ~ dpois(lambda), 
   lambda <- a + b*versionN + c*portalN + d*versionN*portalN, 
-    a ~ dnorm(1.5,3),
-  c(b,c,d) ~ dnorm(0, 1)),  
+    a ~ dnorm(1.5,5),
+  c(b,c,d) ~ dnorm(0, 5)),  
   data = web_visit,iter = 10000, chains = 4, cores = 4
 )
 ```
