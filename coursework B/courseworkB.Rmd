@@ -149,8 +149,21 @@ pairs(emmeans(m, ~model | TeD))
 *What is the effect of the TrD’s on the final model performance?*
 
 ```{r}
-cols <- c("TrD1", "TrD2", "TrD3", "TrD4", "TrD5", "TrD6", "TrD7", "TrD8")
-d[cols] <- lapply(d[cols], factor)
+library(caret)
+
+d$TeD <- as.factor(d$TeD)
+dummies <- dummyVars( ~ ., data = d, levelsOnly = FALSE)
+dummies <- as.data.frame(predict(dummies, newdata = d))
+TeD <- dummies[,1:7]
+d$Ted.TeD1 <- TeD$TeD.TeD1
+d$Ted.TeD2 <- TeD$TeD.TeD2
+d$Ted.TeD3 <- TeD$TeD.TeD3
+d$Ted.TeD4 <- TeD$TeD.TeD4
+d$Ted.TeD5 <- TeD$TeD.TeD5
+d$Ted.TeD6 <- TeD$TeD.TeD6
+d$Ted.TeD7 <- TeD$TeD.TeD7
+d$Ted.TeD8 <- TeD$TeD.TeD8
+d
 ```
 
 ```{r}
@@ -158,6 +171,7 @@ library(nlme)
 model0 <- lme(score ~ 1, random = ~1|TeD, data = d, method="ML")
 model1 <- lme(score ~ TrD1 + TrD2 + TrD3 + TrD4 + TrD5 + TrD6 + TrD7 + TrD8, random = ~1|TeD, data = d, method="ML")
 model2 <- lme(score ~ trdcount, random = ~1|TeD, data = d, method="ML")
+model3 <- lme(score ~ TrD1 + TrD2 + TrD3 + TrD4 + TrD5 + TrD6 + TrD7 + TrD8 + TrD2 * TrD1 + TrD2 * Ted.TeD1 + TrD2 * Ted.TeD5, random = ~1|TeD, data = d, method="ML")
 ```
 
 ```{r}
@@ -179,11 +193,17 @@ summary(model2)
 intervals(model2, 0.95)
 plot(model2)
 ```
+```{r}
+summary(model3)
+intervals(model3, 0.95)
+plot(model3)
+```
 
 ```{r}
 library(pander)
 pander(anova(model0, model1), caption = "Model comparison between model 0 and model 1")
-pander(anova(model1, model2), caption = "Model comparison between model 0 and model 1")
+pander(anova(model1, model2), caption = "Model comparison between model 1 and model 2")
+pander(anova(model1, model3), caption = "Model comparison between model 1 and model 3")
 ```
 
 ```{r fig.width=7, fig.height=4}
