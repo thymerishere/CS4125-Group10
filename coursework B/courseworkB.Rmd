@@ -92,7 +92,7 @@ To evaluate whether the test dataset is of influence on whether transfer learnin
 
 ```{r}
 library(nlme)
-
+library(pander)
 model0 <- lme(score ~ 1 , random = ~1|TeD, data = d, method="ML")
 model1 <- lme(score ~ modeltype , random = ~1|TeD, data = d, method="ML")
 summary(model0)
@@ -136,8 +136,8 @@ pairs(em)
 We will now investigate the influence of refinement of the models on the mean scores on the different test sets. From the boxplots it looks like refinement increases the mean score on all test data sets, although on TeD1 the median has decreased with full model refinement.
 ``` {r, fig.width=10, fig.height=4}
 library(ggplot2)
-dtlr <- d[which(d$model == "MN" | d$model == "M1" | d$model == "M2" | d$model == "M3" | d$model == "MF" ), c("model", "TeD", "score")]
-dtlr$model <- factor(dtlr$model, levels=c("MN", "M1", "M2", "M3", "MF"))
+dtlr <- d[which(d$model == "S" | d$model == "MN" | d$model == "M1" | d$model == "M2" | d$model == "M3" | d$model == "MF" ), c("model", "TeD", "score")]
+dtlr$model <- factor(dtlr$model, levels=c("S", "MN", "M1", "M2", "M3", "MF"))
 ggplot(dtlr, aes(model, score)) + geom_boxplot() + facet_grid(~TeD)
 ggsave("boxplots_refinement.pdf", plot=last_plot())
 ```
