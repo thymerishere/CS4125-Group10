@@ -92,7 +92,7 @@ To evaluate whether the test dataset is of influence on whether transfer learnin
 
 ```{r}
 library(nlme)
-
+library(pander)
 model0 <- lme(score ~ 1 , random = ~1|TeD, data = d, method="ML")
 model1 <- lme(score ~ modeltype , random = ~1|TeD, data = d, method="ML")
 summary(model0)
@@ -108,14 +108,15 @@ library(rio)
 library(emmeans)
 library(pander)
 
-m <- lm(score ~ modeltype*TeD, d)
-pairs(emmeans(m, ~modeltype | TeD))
+d$dtl <- factor(dtask$modeltype == "M" | dtask$modeltype == "S", labels = c("Non Transfer Learning", "Transfer Learning"))
+m <- lm(score ~ dtl*TeD, d)
+pairs(emmeans(m, ~dtl | TeD))
 ```
 
 <!-- Nog wat toevoegen over p value ajustment (wat wordt gedaan door emmeans) -->
 Next we will analyse the mean scores of the transfer learning models. Comparing the mean scores of S and M on the test sets shows that using additional training sets significantly increases (p < 0.01) the mean score. Comparing the mean score of MN and M1 shows that refining one part of the model on the target test set significantly increases (p < 0.01) the score over performing no refinement. The differences between different amounts of refinement are small. Doing refinement on the full model yields a significantly higher mean score (p < 0.01) over refining one and two parts, but is not significantly better (p = 0.05) than doing refinement on three parts of the model only.
 ``` {r}
-dtl <- d[which(d$modeltype == "Transfer Learning" & d$model != "B1" & d$model != "B2"), c("model", "TeD", "score")]
+dtl <- d[which(d$dtl == "Transfer Learning" & d$model != "B1" & d$model != "B2"), c("model", "TeD", "score")]
 m <- lm(score ~ model*TeD, dtl)
 em <- emmeans(m, ~model)
 plot(em)
@@ -123,7 +124,7 @@ ggsave("emmeans_refinement.pdf")
 pairs(em)
 ```
 ``` {r}
-dtl <- d[which(d$modeltype == "Transfer Learning" & d$model != "B1" & d$model != "B2"), c("model", "TeD", "score")]
+dtl <- d[which(d$dtl == "Transfer Learning" & d$model != "B1" & d$model != "B2"), c("model", "TeD", "score")]
 dtl$singleTrain <-factor(dtl$model == "S",labels=c("Two or More Training Sets", "Single Training Set"))
 
 m <- lm(score ~ singleTrain*TeD, dtl)
