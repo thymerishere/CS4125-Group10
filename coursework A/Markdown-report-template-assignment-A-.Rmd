@@ -231,13 +231,13 @@ pander(leveneTest(semFrame$score, semFrame$Candidate, center = median))
 
 ### Visual inspection Mean and distribution sentiments
 <!-- Graphically examine the mean and distribution sentiments of tweets for each celebrity, and provide interpretation -->
-Analysing the bar graph of sentiment counts for all tweets for each celebrity, we can see that in general tweets about Justin Bieber are the most positive, with most tweets having a sentiment around 0.5, while tweets about Taylor Swift are a bit less positive. Tweets about Billie Eilish are the most negative, or rather, most neutral with the most tweets having sentiment values of 0.
+Analysing the bar graph of sentiment counts for all tweets for each celebrity, we can see that in general tweets about Justin Bieber are the most positive, with most tweets having a sentiment around 1, while tweets about Taylor Swift are a bit less positive. Tweets about Billie Eilish are the most negative, or rather, most neutral with the most tweets having sentiment values of 0.
 
 ```{r, message=FALSE, warning=FALSE, echo = T, results = 'hide', cache=TRUE}
 library(ggplot2)
-p <- semFrame %>% ggplot( aes(x=score)) 
-  + geom_histogram( color="#e9ecef", alpha=0.6, position = 'identity') 
-  + facet_grid(. ~ Candidate)
+p <- semFrame %>% ggplot( aes(x=score)) + 
+  geom_histogram( color="#e9ecef", alpha=0.6, position = 'identity') + 
+  facet_grid(. ~ Candidate)
 ```
 ```{r, fig.cap="Bar plot for the tweet sentiment values for each celebrity.", fig.align='center', out.width='50%'}
 plot(p)
@@ -247,7 +247,7 @@ plot(p)
 
 #### Linear model
 <!-- Use a linear model to analyze whether the knowledge to which celebrity a tweet relates has a significant impact on explaining the sentiments of the tweets. Provide interpretation of results  -->
-Comparing the AIC of a null model ($m_0$) and a model where celebrity is added as a predictor ($m_1$) shows that there is an improvement with the latter model with respect to the quality of the fit, as the AIC is lower with $m_1$. Performing an F-test shows that there is a significant difference in fit between both models. This means that knowing the celebrity gives information about the distribution of tweet sentiments in the data set.
+Comparing the AIC of a null model ($m_0$, $AIC=1942$) and a model where celebrity is added as a predictor ($m_1$, $AIC=1827$) shows that there is an improvement with the latter model with respect to the quality of the fit, as the AIC is lower with $m_1$. Performing an F-test shows that there is a significant ($F=63.49$, p. < 0.01) difference in fit between both models. This means that knowing the celebrity gives information about the distribution of tweet sentiments in the data set.
 
 ```{r, message=FALSE, warning=FALSE, echo = T, results = 'hide', cache=TRUE}
 library(pander)
@@ -293,14 +293,14 @@ TukeyHSD(res.aov)
 
 #### Report section for a scientific publication
 <!-- Write a small section for a scientific publication, in which you report the results of the analyses, and explain the conclusions that can be drawn. -->
-In order to determine whether sentiment of tweets depend on the celebrity they are about, a null model and a model with celebrity added as a independent variable predictor have been constructed. Results showed that the fit was significantly better ($F(2, 897) = 44.39$, p. < 0.01) when the null model ($AIC=1942$) had celebrity added as predictor ($AIC=1827$). We can therefore conclude that the Twitter user base tweets differently about Justin Bieber ($M=0.89,SD=0.69$), Taylor Swift ($M=0.66, SD=0.67$), and Billie Eilish ($M=0.28, SD=0.63$). Further analysis using Post Hoc analysis using Tukey's Honest Significant Difference test showed that there is a significant difference in tweet sentiment distribution in all three celebrity pairs, Taylor Swift - Justin Bieber (p. < 0.01), Billie Eilish - Justin Bieber (p. < 0.01), and Taylor Swift - Billie Eilish (p. < 0.01).
+In order to determine whether sentiment of tweets depend on the celebrity they are about, a null model and a model with celebrity added as a independent variable predictor have been constructed. Results showed that the fit was significantly better ($F_{2, 897} = 63.49$, p. < 0.01) when the null model ($AIC=1942$) had celebrity added as predictor ($AIC=1827$). We can therefore conclude that the Twitter user base tweets differently about Justin Bieber ($M=0.89,SD=0.69$), Taylor Swift ($M=0.66, SD=0.67$), and Billie Eilish ($M=0.28, SD=0.63$). Further analysis using Post Hoc analysis using Tukey's Honest Significant Difference test showed that there is a significant difference in tweet sentiment distribution in all three celebrity pairs, Taylor Swift - Justin Bieber (p. < 0.01), Billie Eilish - Justin Bieber (p. < 0.01), and Taylor Swift - Billie Eilish (p. < 0.01).
 
 ### Bayesian Approach
 
 #### Model description
 
 <!-- Describe the mathematical model fitted on the most extensive model. (hint, look at the mark down file of the lectures to see example on formulate mathematical models in markdown). Justify the priors. -->
-The most complex model tested uses the celebrity as an independent variable to predict the score. As we can expect the tweet sentiments to be normally distributed around 0 with almost all data between -5 and 5 due to the tweet word limit, a normally distributed prior with $\mu=0$ and $\sigma =2$ is used for $\mu$, and we allow $\sigma$ to take a value between 0.0001 and 5. To investigate the influence of Celebrity we add it as a factor and transform the intercept parameter into an index variable, giving us the following model:
+The most complex model tested uses the celebrity as an independent variable to predict the score. As we can expect the tweet sentiments to be normally distributed around 0 with almost all data between -5 and 5 due to the tweet character limit (280 characters), a normally distributed prior with $\mu=0$ and $\sigma =2$ is used for $\mu$, and we allow $\sigma$ to take a value between 0.0001 and 5. To investigate the influence of Celebrity we add it as a factor and transform the intercept parameter into an index variable, giving us the following model:
 
 $$
 \begin{aligned}
